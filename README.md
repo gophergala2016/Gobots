@@ -5,6 +5,31 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Friday January 22, 2016 - 11:35 PM
+
+I fear that my only contribution for the night will be these README updates. My
+mind has turned to mush trying to separate wire formats from easyai formats
+from engine formats from storage formats. These are not the awful development
+practices that I have come to know and love, this is some serious software
+engineering. I spun my wheels first on trying to figure out what was going on
+so I could implement the game logic, then when that failed, I spun my wheels
+trying to implement the other end of the client-server stream. I'm not actually
+sure which one is the server and which one is the client, especially because
+Cap'n Proto throws in a `ServerToClient` method to make sure that I'm royally
+confused. I resolved to work on the frontend UI, for showing robots fighting,
+but then I didn't even know which of our four formats should be used with
+GopherJS. I'll look at this with a fresh set of eyes tomorrow after hopefully
+setting a deadlift PR in the morning and eating a hearty breakfast at my
+favorite café. -Brandon
+
+### Friday January 22, 2016 - 10:47 PM
+
+Dinner took longer than I expected, mainly because dinner turned into drinks,
+and we all know how that goes. In any case, I'm back at the wheel again, and
+I've spent the past 20 minutes looking over Ross's progress, which might as
+well be written in Brainfuck, because my feeble, non Cap'n Proto-oriented mind
+can't make heads or tails of it. More research is required. -Brandon
+
 ### Friday January 22, 2016 - 10:20 PM
 
 Done for the night.  Added a tested `ToWire` method to `engine.Board`.
@@ -31,7 +56,7 @@ like (or storage), but API first, implement later right? -Ross
 
 Ross has entered the arena. Also, it looks like Robot Game expired (or
 something) literally between the Gala starting and now. This is very strange.
-
+-Brandon
 
 ### Friday January 22, 2016 - 5:16 PM
 
@@ -41,4 +66,4 @@ virtually nothing useful exists yet. I was strongly considering Cap'n Proto,
 but it ended up looking far too daunting to pick up in a few minutes, so I'm
 sticking with what I (almost kinda) know. I'm not sleep-deprived or utterly
 useless yet, so might as well get some productive work in bootstrapping the
-application.
+application. -Brandon
