@@ -143,6 +143,10 @@ type Factory func(gameID string) AI
 
 // aiAdapter is a type that implements botapi.Ai by mapping turns to
 // games and calling the AI interface methods.
+//
+// Note: since TakeTurn does not call server.Ack, the Cap'n Proto
+// concurrency model guarantees that each call to TakeTurn happens after
+// the previous return. Thus, we don't need to add any additional locks.
 type aiAdapter struct {
 	factory Factory
 	games   map[string]AI
