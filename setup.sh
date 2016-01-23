@@ -2,3 +2,4 @@
 
 go get github.com/bcspragu/gin
 go get github.com/gopherjs/gopherjs
+go get github.com/boltdb/bolt
