@@ -51,6 +51,8 @@ struct Replay {
   
   struct Round {
     moves @0 :List(Turn);
+    endBoard @1 :Board;
+    # The board at the end of the round, after applying moves
   }
 }
 

@@ -106,9 +106,10 @@ func runMatch(ctx gocontext.Context, ds datastore, aiA, aiB *onlineAI) error {
 		go aiA.takeTurn(turnCtx, gid, b, 0, chA)
 		go aiB.takeTurn(turnCtx, gid, b, 1, chB)
 		ra, rb := <-chA, <-chB
-		// TODO: convert results into parameters for update.
-		_, _ = ra, rb
-		b.Update()
+		if ra.err.HasError() || rb.err.HasError() {
+			// TODO: Something with errors
+		}
+		b.Update(ra.results, rb.results)
 		// TODO: db.addRound
 	}
 
@@ -121,8 +122,8 @@ type onlineAI struct {
 }
 
 type turnResult struct {
-	results botapi.Ai_takeTurn_Results
-	err     error
+	results botapi.Turn_List
+	err     turnError
 }
 
 func (oa *onlineAI) takeTurn(ctx gocontext.Context, gid gameID, b *engine.Board, faction int, ch chan<- turnResult) {
@@ -134,5 +135,28 @@ func (oa *onlineAI) takeTurn(ctx gocontext.Context, gid gameID, b *engine.Board,
 		wb.SetGameId(string(gid))
 		return b.ToWire(wb, faction)
 	}).Struct()
-	ch <- turnResult{results, err}
+	var te turnError
+	if err != nil {
+		te = append(te, err)
+	}
+
+	tl, err := results.Turns()
+	if err != nil {
+		te = append(te, err)
+	}
+	ch <- turnResult{tl, te}
+}
+
+type turnError []error
+
+func (t turnError) Error() string {
+	var e string
+	for _, err := range t {
+		e += err.Error()
+	}
+	return e
+}
+
+func (t turnError) HasError() bool {
+	return len(t) > 0
 }

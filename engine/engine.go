@@ -7,6 +7,17 @@ import (
 	"github.com/gophergala2016/Gobots/botapi"
 )
 
+// TODO: Fix the super inconsistent board API that alternates between taking in
+// *Robots and RobotIDs, it's gross
+
+const (
+	CollisionDamage = 1
+	AttackDamage    = 2
+	DestructDamage  = 2
+)
+
+type collisionMap map[Loc][]RobotID
+
 type Board struct {
 	cells []*Robot
 	Size  Loc
@@ -29,9 +40,140 @@ func NewBoard(w, h int) *Board {
 	return EmptyBoard(w, h)
 }
 
-func (b *Board) Update() {
-	// TODO
+func (b *Board) Update(ta, tb botapi.Turn_List) {
+	c := make(collisionMap)
+	b.addCollisions(c, ta)
+	b.addCollisions(c, tb)
+
+	// Move the bots to their new locations, unless they collide with something,
+	// in which case just subtract 1 from their health and don't move them.
+
+	for loc, botIDs := range c {
+		// If there's only one bot trying to get somewhere, just move them there
+		if len(botIDs) == 1 {
+			b.moveBot(botIDs[0], loc)
+		}
+
+		// Multiple bots, hurt 'em
+		for _, id := range botIDs {
+			// TODO: nil check, for safety
+			bot := b.robot(id)
+			b.hurtBot(bot, CollisionDamage)
+		}
+	}
+
+	// Ok, we've moved everyone into place and hurt them for bumping into each
+	// other, now we issue attacks
+	// We issue attacks first, because I don't like the idea of robots
+	// self-destructing when someone could have killed them, it makes for better
+	// strategy this way
+
+	// TODO: attacks
+	// TODO: self destructs
+
 	b.Round++
+}
+
+func (b *Board) addCollisions(c collisionMap, ts botapi.Turn_List) {
+	for i := 0; i < ts.Len(); i++ {
+		t := ts.At(i)
+		id := RobotID(t.Id())
+		nextLoc := b.nextLoc(id, t)
+		// Add where they want to move
+		c[nextLoc] = append(c[nextLoc], id)
+	}
+}
+
+func (b *Board) hurtBot(r *Robot, damage int) {
+	r.Health -= damage
+	// Smite them
+	if r.Health <= 0 {
+		loc := b.robotLoc(r.ID)
+		ind := b.cellIndex(loc)
+		b.cells[ind] = nil // BOoOoOM, roasted
+	}
+}
+
+// TODO: Maybe make sure they're not teleporting across the board
+func (b *Board) moveBot(id RobotID, loc Loc) {
+	oldLoc := b.robotLoc(id)
+	ind := b.cellIndex(oldLoc)
+
+	bot := b.cells[ind]
+	b.cells[ind] = nil
+	b.cells[b.cellIndex(loc)] = bot
+}
+
+func (b *Board) cellIndex(loc Loc) int {
+	return loc.Y*b.Size.X + loc.X
+}
+
+func (b *Board) nextLoc(id RobotID, t botapi.Turn) Loc {
+	currentLoc := b.robotLoc(id)
+	// If they aren't moving, return their current loc
+	if t.Which() != botapi.Turn_Which_move {
+		return currentLoc
+	}
+
+	// They're moving, return where they're going
+	var xOff, yOff int
+	switch t.Move() {
+	case botapi.Direction_north:
+		yOff = -1
+	case botapi.Direction_south:
+		yOff = 1
+	case botapi.Direction_east:
+		xOff = 1
+	case botapi.Direction_west:
+		xOff = -1
+	}
+
+	nextLoc := Loc{
+		X: currentLoc.X + xOff,
+		Y: currentLoc.Y + yOff,
+	}
+
+	if b.isValidLoc(nextLoc) {
+		return nextLoc
+	}
+
+	// TODO: Penalize people for creating incompetent bots that like travelling
+	// to invalid locations, which is the case if we've reached here.
+	return currentLoc
+}
+
+// TODO: Jesus Christ this is inefficient, we should have a map from ids to
+// locations for O(1) lookups, our turn algorithm is going to be like O(n^3),
+// which doesn't matter for like 10 bots, but still.
+func (b *Board) robotLoc(id RobotID) Loc {
+	for i, c := range b.cells {
+		if c == nil {
+			continue
+		}
+		if c.ID != id {
+			continue
+		}
+
+		return Loc{
+			X: i % b.Size.X,
+			Y: i / b.Size.X,
+		}
+	}
+	return Loc{}
+}
+
+func (b *Board) robot(id RobotID) *Robot {
+	for _, c := range b.cells {
+		if c == nil {
+			continue
+		}
+		if c.ID != id {
+			continue
+		}
+
+		return c
+	}
+	return nil
 }
 
 // IsFinished reports whether the game is finished.
@@ -51,6 +193,7 @@ func (b *Board) At(loc Loc) *Robot {
 // Used for initialization.
 func (b *Board) Set(loc Loc, r *Robot) {
 	if !b.isValidLoc(loc) {
+		// TODO: Is panic the right thing to do here?
 		panic("location out of bounds")
 	}
 	b.cells[loc.Y*b.Size.X+loc.X] = r

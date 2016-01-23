@@ -877,7 +877,7 @@ func (p Replay_Promise) InitialBoard() Board_Promise {
 type Replay_Round struct{ capnp.Struct }
 
 func NewReplay_Round(s *capnp.Segment) (Replay_Round, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 2})
 	if err != nil {
 		return Replay_Round{}, err
 	}
@@ -885,7 +885,7 @@ func NewReplay_Round(s *capnp.Segment) (Replay_Round, error) {
 }
 
 func NewRootReplay_Round(s *capnp.Segment) (Replay_Round, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 2})
 	if err != nil {
 		return Replay_Round{}, err
 	}
@@ -917,12 +917,40 @@ func (s Replay_Round) SetMoves(v Turn_List) error {
 	return s.Struct.SetPointer(0, v.List)
 }
 
+func (s Replay_Round) EndBoard() (Board, error) {
+	p, err := s.Struct.Pointer(1)
+	if err != nil {
+		return Board{}, err
+	}
+
+	ss := capnp.ToStruct(p)
+
+	return Board{Struct: ss}, nil
+}
+
+func (s Replay_Round) SetEndBoard(v Board) error {
+
+	return s.Struct.SetPointer(1, v.Struct)
+}
+
+// NewEndBoard sets the endBoard field to a newly
+// allocated Board struct, preferring placement in s's segment.
+func (s Replay_Round) NewEndBoard() (Board, error) {
+
+	ss, err := NewBoard(s.Struct.Segment())
+	if err != nil {
+		return Board{}, err
+	}
+	err = s.Struct.SetPointer(1, ss)
+	return ss, err
+}
+
 // Replay_Round_List is a list of Replay_Round.
 type Replay_Round_List struct{ capnp.List }
 
 // NewReplay_Round creates a new list of Replay_Round.
 func NewReplay_Round_List(s *capnp.Segment, sz int32) (Replay_Round_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 2}, sz)
 	if err != nil {
 		return Replay_Round_List{}, err
 	}
@@ -938,6 +966,10 @@ type Replay_Round_Promise struct{ *capnp.Pipeline }
 func (p Replay_Round_Promise) Struct() (Replay_Round, error) {
 	s, err := p.Pipeline.Struct()
 	return Replay_Round{s}, err
+}
+
+func (p Replay_Round_Promise) EndBoard() Board_Promise {
+	return Board_Promise{Pipeline: p.Pipeline.GetPipeline(1)}
 }
 
 type Faction uint16

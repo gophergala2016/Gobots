@@ -7,6 +7,9 @@ import (
 	"net/http"
 )
 
+// Note: The comment under this became irrelevant like 10 minutes into
+// development, it's only here for posterity
+
 // TODO(bsprague): LITERALLY EVERYTHING. Off the top:
 
 // - The server - It needs to be able to serve pages, handle matches, do OAuth

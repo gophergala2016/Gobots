@@ -87,7 +87,10 @@ func TestUpdate(t *testing.T) {
 
 		t.Logf("  -> Update()")
 		// TODO: add parameters
-		b.Update()
+		// TODO Even harder: This line being commented out breaks the tests, need
+		// to insert blank Turn_Lists, but I don't even know how to properly call
+		// NewTurn_List. TF is a segment?!
+		//b.Update()
 
 		if b.Round != test.wantRound {
 			t.Errorf("  !! b.Round = %d; want %d", b.Round, test.wantRound)
