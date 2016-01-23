@@ -25,6 +25,8 @@ interface Ai {
 }
 
 struct Board {
+  gameId @4 :Text;
+
   width @0 :Int16;
   height @1 :Int16;
   robots @2 :List(Robot);
