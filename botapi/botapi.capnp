@@ -38,8 +38,8 @@ struct Board {
 
 struct Robot {
   id @0 :RobotId;
-  x @1 :Int16;
-  y @2 :Int16;
+  x @1 :UInt16;
+  y @2 :UInt16;
   health @3 :Int16;
   faction @4 :Faction;
 }

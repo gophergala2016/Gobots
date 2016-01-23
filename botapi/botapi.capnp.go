@@ -274,6 +274,14 @@ func (s Credentials) SecretToken() (string, error) {
 
 }
 
+func (s Credentials) SecretTokenBytes() ([]byte, error) {
+	p, err := s.Struct.Pointer(0)
+	if err != nil {
+		return nil, err
+	}
+	return capnp.ToData(p), nil
+}
+
 func (s Credentials) SetSecretToken(v string) error {
 
 	t, err := capnp.NewText(s.Struct.Segment(), v)
@@ -563,6 +571,14 @@ func (s Board) GameId() (string, error) {
 
 }
 
+func (s Board) GameIdBytes() ([]byte, error) {
+	p, err := s.Struct.Pointer(1)
+	if err != nil {
+		return nil, err
+	}
+	return capnp.ToData(p), nil
+}
+
 func (s Board) SetGameId(v string) error {
 
 	t, err := capnp.NewText(s.Struct.Segment(), v)
@@ -674,22 +690,22 @@ func (s Robot) SetId(v uint32) {
 	s.Struct.SetUint32(0, v)
 }
 
-func (s Robot) X() int16 {
-	return int16(s.Struct.Uint16(4))
+func (s Robot) X() uint16 {
+	return s.Struct.Uint16(4)
 }
 
-func (s Robot) SetX(v int16) {
+func (s Robot) SetX(v uint16) {
 
-	s.Struct.SetUint16(4, uint16(v))
+	s.Struct.SetUint16(4, v)
 }
 
-func (s Robot) Y() int16 {
-	return int16(s.Struct.Uint16(6))
+func (s Robot) Y() uint16 {
+	return s.Struct.Uint16(6)
 }
 
-func (s Robot) SetY(v int16) {
+func (s Robot) SetY(v uint16) {
 
-	s.Struct.SetUint16(6, uint16(v))
+	s.Struct.SetUint16(6, v)
 }
 
 func (s Robot) Health() int16 {
@@ -768,6 +784,14 @@ func (s Replay) GameId() (string, error) {
 
 	return capnp.ToText(p), nil
 
+}
+
+func (s Replay) GameIdBytes() ([]byte, error) {
+	p, err := s.Struct.Pointer(0)
+	if err != nil {
+		return nil, err
+	}
+	return capnp.ToData(p), nil
 }
 
 func (s Replay) SetGameId(v string) error {
