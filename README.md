@@ -5,6 +5,12 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Friday January 22, 2016 - 8:45 PM
+
+Basic API schema and database interface, along with an idiomatic client wrapper
+for writing bots.  Still not sure what the main server loop is going to look
+like (or storage), but API first, implement later right? -Ross
+
 ### Friday January 22, 2016 - 5:54 PM
 
 Ross has entered the arena. Also, it looks like Robot Game expired (or
