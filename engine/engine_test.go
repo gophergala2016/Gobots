@@ -1,6 +1,11 @@
 package engine
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/gophergala2016/Gobots/botapi"
+	"zombiezen.com/go/capnproto2"
+)
 
 func TestNewBoardIsEmpty(t *testing.T) {
 	b := NewBoard(3, 5)
@@ -109,5 +114,69 @@ func TestUpdate(t *testing.T) {
 				}
 			}
 		}
+	}
+}
+
+func TestToWire(t *testing.T) {
+	b := NewBoard(4, 6)
+	b.Set(Loc{1, 2}, &Robot{ID: 254, Health: 50, Faction: 0})
+	b.Set(Loc{3, 4}, &Robot{ID: 973, Health: 12, Faction: 1})
+	b.Round = 42
+
+	_, seg, err := capnp.NewMessage(capnp.SingleSegment(nil))
+	if err != nil {
+		t.Fatal("capnp.NewMessage:", err)
+	}
+	wb, err := botapi.NewRootBoard(seg)
+	if err != nil {
+		t.Fatal("botapi.NewRootBoard:", err)
+	}
+
+	err = b.ToWire(wb, 1)
+	if err != nil {
+		t.Fatal("b.ToWire:", err)
+	}
+
+	if wb.Width() != 4 {
+		t.Errorf("width = %d; want 4", wb.Width())
+	}
+	if wb.Height() != 6 {
+		t.Errorf("height = %d; want 6", wb.Height())
+	}
+	if wb.Round() != 42 {
+		t.Errorf("round = %d; want 42", wb.Round())
+	}
+	if robots, err := wb.Robots(); err == nil {
+		if robots.Len() == 2 {
+			if robots.At(0).Id() != 254 {
+				t.Errorf("robots[0].id = %d; want 254", robots.At(0).Id())
+			}
+			if robots.At(0).X() != 1 || robots.At(0).Y() != 2 {
+				t.Errorf("robots[0].x,y = %d,%d; want 1,2", robots.At(0).X(), robots.At(0).Y())
+			}
+			if robots.At(0).Health() != 50 {
+				t.Errorf("robots[0].health = %d; want 50", robots.At(0).Health())
+			}
+			if robots.At(0).Faction() != botapi.Faction_opponent {
+				t.Errorf("robots[0].faction = %v; want opponent", robots.At(0).Faction())
+			}
+
+			if robots.At(1).Id() != 973 {
+				t.Errorf("robots[1].id = %d; want 973", robots.At(1).Id())
+			}
+			if robots.At(1).X() != 3 || robots.At(1).Y() != 4 {
+				t.Errorf("robots[1].x,y = %d,%d; want 3,4", robots.At(1).X(), robots.At(1).Y())
+			}
+			if robots.At(1).Health() != 12 {
+				t.Errorf("robots[1].health = %d; want 12", robots.At(1).Health())
+			}
+			if robots.At(1).Faction() != botapi.Faction_mine {
+				t.Errorf("robots[1].faction = %v; want mine", robots.At(1).Faction())
+			}
+		} else {
+			t.Errorf("len(robots) = %d; want 2", robots.Len())
+		}
+	} else {
+		t.Errorf("robots error: %v", err)
 	}
 }
