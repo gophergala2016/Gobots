@@ -28,6 +28,7 @@ func main() {
 	http.HandleFunc("/", withLogin(serveIndex))
 
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
 
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
