@@ -733,6 +733,189 @@ func (p Robot_Promise) Struct() (Robot, error) {
 	return Robot{s}, err
 }
 
+type Replay struct{ capnp.Struct }
+
+func NewReplay(s *capnp.Segment) (Replay, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 3})
+	if err != nil {
+		return Replay{}, err
+	}
+	return Replay{st}, nil
+}
+
+func NewRootReplay(s *capnp.Segment) (Replay, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 3})
+	if err != nil {
+		return Replay{}, err
+	}
+	return Replay{st}, nil
+}
+
+func ReadRootReplay(msg *capnp.Message) (Replay, error) {
+	root, err := msg.Root()
+	if err != nil {
+		return Replay{}, err
+	}
+	st := capnp.ToStruct(root)
+	return Replay{st}, nil
+}
+
+func (s Replay) GameId() (string, error) {
+	p, err := s.Struct.Pointer(0)
+	if err != nil {
+		return "", err
+	}
+
+	return capnp.ToText(p), nil
+
+}
+
+func (s Replay) SetGameId(v string) error {
+
+	t, err := capnp.NewText(s.Struct.Segment(), v)
+	if err != nil {
+		return err
+	}
+	return s.Struct.SetPointer(0, t)
+}
+
+func (s Replay) InitialBoard() (Board, error) {
+	p, err := s.Struct.Pointer(1)
+	if err != nil {
+		return Board{}, err
+	}
+
+	ss := capnp.ToStruct(p)
+
+	return Board{Struct: ss}, nil
+}
+
+func (s Replay) SetInitialBoard(v Board) error {
+
+	return s.Struct.SetPointer(1, v.Struct)
+}
+
+// NewInitialBoard sets the initialBoard field to a newly
+// allocated Board struct, preferring placement in s's segment.
+func (s Replay) NewInitialBoard() (Board, error) {
+
+	ss, err := NewBoard(s.Struct.Segment())
+	if err != nil {
+		return Board{}, err
+	}
+	err = s.Struct.SetPointer(1, ss)
+	return ss, err
+}
+
+func (s Replay) Rounds() (Replay_Round_List, error) {
+	p, err := s.Struct.Pointer(2)
+	if err != nil {
+		return Replay_Round_List{}, err
+	}
+
+	l := capnp.ToList(p)
+
+	return Replay_Round_List{List: l}, nil
+}
+
+func (s Replay) SetRounds(v Replay_Round_List) error {
+
+	return s.Struct.SetPointer(2, v.List)
+}
+
+// Replay_List is a list of Replay.
+type Replay_List struct{ capnp.List }
+
+// NewReplay creates a new list of Replay.
+func NewReplay_List(s *capnp.Segment, sz int32) (Replay_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 3}, sz)
+	if err != nil {
+		return Replay_List{}, err
+	}
+	return Replay_List{l}, nil
+}
+
+func (s Replay_List) At(i int) Replay           { return Replay{s.List.Struct(i)} }
+func (s Replay_List) Set(i int, v Replay) error { return s.List.SetStruct(i, v.Struct) }
+
+// Replay_Promise is a wrapper for a Replay promised by a client call.
+type Replay_Promise struct{ *capnp.Pipeline }
+
+func (p Replay_Promise) Struct() (Replay, error) {
+	s, err := p.Pipeline.Struct()
+	return Replay{s}, err
+}
+
+func (p Replay_Promise) InitialBoard() Board_Promise {
+	return Board_Promise{Pipeline: p.Pipeline.GetPipeline(1)}
+}
+
+type Replay_Round struct{ capnp.Struct }
+
+func NewReplay_Round(s *capnp.Segment) (Replay_Round, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	if err != nil {
+		return Replay_Round{}, err
+	}
+	return Replay_Round{st}, nil
+}
+
+func NewRootReplay_Round(s *capnp.Segment) (Replay_Round, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	if err != nil {
+		return Replay_Round{}, err
+	}
+	return Replay_Round{st}, nil
+}
+
+func ReadRootReplay_Round(msg *capnp.Message) (Replay_Round, error) {
+	root, err := msg.Root()
+	if err != nil {
+		return Replay_Round{}, err
+	}
+	st := capnp.ToStruct(root)
+	return Replay_Round{st}, nil
+}
+
+func (s Replay_Round) Moves() (Turn_List, error) {
+	p, err := s.Struct.Pointer(0)
+	if err != nil {
+		return Turn_List{}, err
+	}
+
+	l := capnp.ToList(p)
+
+	return Turn_List{List: l}, nil
+}
+
+func (s Replay_Round) SetMoves(v Turn_List) error {
+
+	return s.Struct.SetPointer(0, v.List)
+}
+
+// Replay_Round_List is a list of Replay_Round.
+type Replay_Round_List struct{ capnp.List }
+
+// NewReplay_Round creates a new list of Replay_Round.
+func NewReplay_Round_List(s *capnp.Segment, sz int32) (Replay_Round_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
+	if err != nil {
+		return Replay_Round_List{}, err
+	}
+	return Replay_Round_List{l}, nil
+}
+
+func (s Replay_Round_List) At(i int) Replay_Round           { return Replay_Round{s.List.Struct(i)} }
+func (s Replay_Round_List) Set(i int, v Replay_Round) error { return s.List.SetStruct(i, v.Struct) }
+
+// Replay_Round_Promise is a wrapper for a Replay_Round promised by a client call.
+type Replay_Round_Promise struct{ *capnp.Pipeline }
+
+func (p Replay_Round_Promise) Struct() (Replay_Round, error) {
+	s, err := p.Pipeline.Struct()
+	return Replay_Round{s}, err
+}
+
 type Faction uint16
 
 // Values of Faction.
