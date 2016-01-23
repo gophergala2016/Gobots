@@ -1,5 +1,12 @@
 package main
 
+import (
+	"flag"
+	"html/template"
+	"log"
+	"net/http"
+)
+
 // TODO(bsprague): LITERALLY EVERYTHING. Off the top:
 
 // - The server - It needs to be able to serve pages, handle matches, do OAuth
@@ -12,5 +19,27 @@ package main
 // case, gopherjs should be used so that the implementation only needs to be
 // written once
 
+var addr = flag.String("addr", ":8080", "server address")
+var templates = tmpl{template.Must(template.ParseGlob("templates/*.html"))}
+
 func main() {
+	flag.Parse()
+
+	http.HandleFunc("/", withLogin(serveIndex))
+
+	err := http.ListenAndServe(*addr, nil)
+	if err != nil {
+		log.Fatal("Yeah...so about that whole server thing: ", err)
+	}
+}
+
+func serveIndex(c context) {
+	if err := templates.ExecuteTemplate(c, "index.html", struct{}{}); err != nil {
+		serveError(c.w, err)
+	}
+}
+
+func serveError(w http.ResponseWriter, err error) {
+	w.Write([]byte("Internal Server Error"))
+	log.Printf("Error: %v\n", err)
 }
