@@ -5,6 +5,8 @@ using Go = import "../../../../zombiezen.com/go/capnproto2/go.capnp";
 $Go.package("botapi");
 $Go.import("github.com/gophergala2016/Gobots/botapi");
 
+using RobotId = UInt32;
+
 interface AiConnector {
   # Bootstrap interface for the server.
   connect @0 ConnectRequest -> ();
@@ -21,21 +23,21 @@ struct Credentials {
 
 interface Ai {
   # Interface that a competitor implements.
-  takeTurn @0 (board :Board) -> (turn :List(Turn));
+  takeTurn @0 (board :Board) -> (turns :List(Turn));
 }
 
 struct Board {
   gameId @4 :Text;
 
-  width @0 :Int16;
-  height @1 :Int16;
+  width @0 :UInt16;
+  height @1 :UInt16;
   robots @2 :List(Robot);
 
   round @3 :Int32;
 }
 
 struct Robot {
-  id @0 :Int32;
+  id @0 :RobotId;
   x @1 :Int16;
   y @2 :Int16;
   health @3 :Int16;
@@ -58,7 +60,7 @@ enum Faction {
 }
 
 struct Turn {
-  id @3 :Int32;
+  id @3 :RobotId;
 
   union {
     wait @0 :Void;

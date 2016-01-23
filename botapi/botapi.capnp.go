@@ -483,7 +483,7 @@ func ReadRootAi_takeTurn_Results(msg *capnp.Message) (Ai_takeTurn_Results, error
 	return Ai_takeTurn_Results{st}, nil
 }
 
-func (s Ai_takeTurn_Results) Turn() (Turn_List, error) {
+func (s Ai_takeTurn_Results) Turns() (Turn_List, error) {
 	p, err := s.Struct.Pointer(0)
 	if err != nil {
 		return Turn_List{}, err
@@ -494,7 +494,7 @@ func (s Ai_takeTurn_Results) Turn() (Turn_List, error) {
 	return Turn_List{List: l}, nil
 }
 
-func (s Ai_takeTurn_Results) SetTurn(v Turn_List) error {
+func (s Ai_takeTurn_Results) SetTurns(v Turn_List) error {
 
 	return s.Struct.SetPointer(0, v.List)
 }
@@ -572,22 +572,22 @@ func (s Board) SetGameId(v string) error {
 	return s.Struct.SetPointer(1, t)
 }
 
-func (s Board) Width() int16 {
-	return int16(s.Struct.Uint16(0))
+func (s Board) Width() uint16 {
+	return s.Struct.Uint16(0)
 }
 
-func (s Board) SetWidth(v int16) {
+func (s Board) SetWidth(v uint16) {
 
-	s.Struct.SetUint16(0, uint16(v))
+	s.Struct.SetUint16(0, v)
 }
 
-func (s Board) Height() int16 {
-	return int16(s.Struct.Uint16(2))
+func (s Board) Height() uint16 {
+	return s.Struct.Uint16(2)
 }
 
-func (s Board) SetHeight(v int16) {
+func (s Board) SetHeight(v uint16) {
 
-	s.Struct.SetUint16(2, uint16(v))
+	s.Struct.SetUint16(2, v)
 }
 
 func (s Board) Robots() (Robot_List, error) {
@@ -665,13 +665,13 @@ func ReadRootRobot(msg *capnp.Message) (Robot, error) {
 	return Robot{st}, nil
 }
 
-func (s Robot) Id() int32 {
-	return int32(s.Struct.Uint32(0))
+func (s Robot) Id() uint32 {
+	return s.Struct.Uint32(0)
 }
 
-func (s Robot) SetId(v int32) {
+func (s Robot) SetId(v uint32) {
 
-	s.Struct.SetUint32(0, uint32(v))
+	s.Struct.SetUint32(0, v)
 }
 
 func (s Robot) X() int16 {
@@ -843,13 +843,13 @@ func (s Turn) Which() Turn_Which {
 	return Turn_Which(s.Struct.Uint16(0))
 }
 
-func (s Turn) Id() int32 {
-	return int32(s.Struct.Uint32(4))
+func (s Turn) Id() uint32 {
+	return s.Struct.Uint32(4)
 }
 
-func (s Turn) SetId(v int32) {
+func (s Turn) SetId(v uint32) {
 
-	s.Struct.SetUint32(4, uint32(v))
+	s.Struct.SetUint32(4, v)
 }
 
 func (s Turn) SetWait() {
