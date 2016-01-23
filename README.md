@@ -5,6 +5,17 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Saturday January 23, 2016 - 2:43 PM
+
+That's more like it. After a good night's sleep and looking at the code base
+with a fresh set of eyes (and some more instruction), I'm back on the
+productivity train, and a lot of the game logic is implemented. I also hit
+295x7 for DL, which is a PR and felt pretty sweet.
+![Picking things up](http://i.imgur.com/507xBdZ.jpg)
+Oh, and I'm caffeinated as all hell, which is probably helping move things
+along.
+![Drinking things down](http://i.imgur.com/WM8tlQv.jpg)
+
 ### Saturday January 23, 2016 - 9:09 AM
 
 Fearing that my colleague may be hopelessly lost and confused by my "Commits
