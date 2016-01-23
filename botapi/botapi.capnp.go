@@ -529,7 +529,7 @@ func (p Ai_takeTurn_Results_Promise) Struct() (Ai_takeTurn_Results, error) {
 type Board struct{ capnp.Struct }
 
 func NewBoard(s *capnp.Segment) (Board, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 1})
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 2})
 	if err != nil {
 		return Board{}, err
 	}
@@ -537,7 +537,7 @@ func NewBoard(s *capnp.Segment) (Board, error) {
 }
 
 func NewRootBoard(s *capnp.Segment) (Board, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 1})
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 2})
 	if err != nil {
 		return Board{}, err
 	}
@@ -551,6 +551,25 @@ func ReadRootBoard(msg *capnp.Message) (Board, error) {
 	}
 	st := capnp.ToStruct(root)
 	return Board{st}, nil
+}
+
+func (s Board) GameId() (string, error) {
+	p, err := s.Struct.Pointer(1)
+	if err != nil {
+		return "", err
+	}
+
+	return capnp.ToText(p), nil
+
+}
+
+func (s Board) SetGameId(v string) error {
+
+	t, err := capnp.NewText(s.Struct.Segment(), v)
+	if err != nil {
+		return err
+	}
+	return s.Struct.SetPointer(1, t)
 }
 
 func (s Board) Width() int16 {
@@ -601,7 +620,7 @@ type Board_List struct{ capnp.List }
 
 // NewBoard creates a new list of Board.
 func NewBoard_List(s *capnp.Segment, sz int32) (Board_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 8, PointerCount: 1}, sz)
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 8, PointerCount: 2}, sz)
 	if err != nil {
 		return Board_List{}, err
 	}
