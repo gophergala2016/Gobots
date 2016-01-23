@@ -42,6 +42,16 @@ struct Robot {
   faction @4 :Faction;
 }
 
+struct Replay {
+  gameId @0 :Text;
+  initialBoard @1 :Board;
+  rounds @2 :List(Round);
+  
+  struct Round {
+    moves @0 :List(Turn);
+  }
+}
+
 enum Faction {
   mine @0;
   opponent @1;
