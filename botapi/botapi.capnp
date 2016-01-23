@@ -1,4 +1,9 @@
+using Go = import "../../../../zombiezen.com/go/capnproto2/go.capnp";
+
 @0x834c2fcbeb96c6bd;
+
+$Go.package("botapi");
+$Go.import("github.com/gophergala2016/Gobots/botapi");
 
 interface AiConnector {
   # Bootstrap interface for the server.
@@ -16,7 +21,7 @@ struct Credentials {
 
 interface Ai {
   # Interface that a competitor implements.
-  takeTurn @0 (board :Board) -> (turn :Turn);
+  takeTurn @0 (board :Board) -> (turn :List(Turn));
 }
 
 struct Board {
@@ -24,9 +29,7 @@ struct Board {
   height @1 :Int16;
   robots @2 :List(Robot);
 
-  myPoints @3 :Int32;
-  opponentPoints @4 :Int32;
-  round @5 :Int32;
+  round @3 :Int32;
 }
 
 struct Robot {
@@ -43,6 +46,8 @@ enum Faction {
 }
 
 struct Turn {
+  id @3 :Int32;
+
   union {
     wait @0 :Void;
     # Skip turn; do nothing.
@@ -50,6 +55,9 @@ struct Turn {
     move @1 :Direction;
 
     attack @2 :Direction;
+
+    selfDestruct @4 :Void;
+    # Does damage to all surrounding ships (even diagonals).
   }
 }
 
