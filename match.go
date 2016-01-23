@@ -72,8 +72,14 @@ func (e *aiEndpoint) listOnlineAIs() []onlineAI {
 
 // connect adds an online AI, given the secret auth token.
 func (e *aiEndpoint) connect(token string, ai botapi.Ai) (aiID, error) {
-	// TODO
-	return "", nil
+	info, err := e.ds.lookupAIToken(token)
+	if err != nil {
+		return "", err
+	}
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.online[info.id] = ai
+	return info.id, nil
 }
 
 // removeAIs drops AIs from online, usually via disconnection.
