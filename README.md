@@ -5,6 +5,12 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Friday January 22, 2016 - 9:27 PM
+
+Created an engine package.  I figure we write the logic here where mutating
+is easier to do in structs, and then bake out for storage or wire transfer.
+-Ross
+
 ### Friday January 22, 2016 - 8:45 PM
 
 Basic API schema and database interface, along with an idiomatic client wrapper
