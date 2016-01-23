@@ -19,13 +19,15 @@ import (
 // case, gopherjs should be used so that the implementation only needs to be
 // written once
 
-var addr = flag.String("addr", ":8080", "server address")
+var addr = flag.String("addr", ":8000", "server address")
 var templates = tmpl{template.Must(template.ParseGlob("templates/*.html"))}
 
 func main() {
 	flag.Parse()
 
 	http.HandleFunc("/", withLogin(serveIndex))
+
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
 
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
