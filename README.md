@@ -5,6 +5,16 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Friday January 22, 2016 - 10:20 PM
+
+Done for the night.  Added a tested `ToWire` method to `engine.Board`.
+Converting to storage needs should be similarly trivial.  Added test
+infrastructure for the `engine.Board.Update` method, so when the game logic
+actually gets implemented, it's easy to test for correctness.  Not sure exactly
+what to do for preserving turns as a basis, but I presume that it would be easy
+to write a function of `(Replay, Round) -> Replay`. It would probably be good to
+add a `engine.FromWire` function too. G'night. -Ross
+
 ### Friday January 22, 2016 - 9:27 PM
 
 Created an engine package.  I figure we write the logic here where mutating
