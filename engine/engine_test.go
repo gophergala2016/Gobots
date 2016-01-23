@@ -42,3 +42,72 @@ func TestBoard_Set(t *testing.T) {
 		t.Errorf("b.At(%v) = nil", r)
 	}
 }
+
+func TestUpdate(t *testing.T) {
+	tests := []struct {
+		size      Loc
+		init      map[Loc]Robot
+		initRound int
+
+		// TODO: parameters for round
+
+		want      map[Loc]Robot
+		wantRound int
+	}{
+		// TODO: This is no-op update change detector test.
+		{
+			size: Loc{5, 5},
+			init: map[Loc]Robot{
+				Loc{1, 1}: Robot{ID: 123, Health: 10, Faction: 0},
+				Loc{2, 2}: Robot{ID: 456, Health: 10, Faction: 1},
+			},
+			initRound: 0,
+			want: map[Loc]Robot{
+				Loc{1, 1}: Robot{ID: 123, Health: 10, Faction: 0},
+				Loc{2, 2}: Robot{ID: 456, Health: 10, Faction: 1},
+			},
+			wantRound: 1,
+		},
+	}
+	for i, test := range tests {
+		t.Logf("tests[%d], size = %v, round = %d", i, test.size, test.initRound)
+		b := NewBoard(test.size.X, test.size.Y)
+		b.Round = test.initRound
+		for l, r := range test.init {
+			t.Logf("  -> set %v to %#v", l, r)
+			rr := new(Robot)
+			*rr = r
+			b.Set(l, rr)
+		}
+
+		t.Logf("  -> Update()")
+		// TODO: add parameters
+		b.Update()
+
+		if b.Round != test.wantRound {
+			t.Errorf("  !! b.Round = %d; want %d", b.Round, test.wantRound)
+		}
+
+		for y := 0; y < test.size.Y; y++ {
+			for x := 0; x < test.size.X; x++ {
+				loc := Loc{x, y}
+				r := b.At(loc)
+				want, ok := test.want[loc]
+				if (r != nil) != ok {
+					if ok {
+						t.Errorf("  !! b.At(%v) = nil; want %#v", loc, want)
+					} else {
+						t.Errorf("  !! b.At(%v) = %#v; want nil", loc, r)
+					}
+					continue
+				}
+				if !ok {
+					continue
+				}
+				if *r != want {
+					t.Errorf("  !! b.At(%v) = %#v; want %#v", loc, r, want)
+				}
+			}
+		}
+	}
+}

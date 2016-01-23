@@ -1,6 +1,9 @@
 package engine
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type Board struct {
 	cells []*Robot
@@ -19,7 +22,7 @@ func NewBoard(w, h int) *Board {
 }
 
 func (b *Board) Update() {
-	// code...
+	// TODO
 }
 
 // At returns the robot at a location or nil if not found.
@@ -51,6 +54,14 @@ type Robot struct {
 }
 
 type RobotID uint32
+
+func (id RobotID) String() string {
+	return strconv.FormatUint(uint64(id), 10)
+}
+
+func (id RobotID) GoString() string {
+	return id.String()
+}
 
 // Loc is a position on a board.
 type Loc struct {
