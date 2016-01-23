@@ -14,6 +14,7 @@ const (
 	CollisionDamage = 1
 	AttackDamage    = 2
 	DestructDamage  = 2
+	SelfDamage      = 1000 // Make them super dead
 )
 
 type collisionMap map[Loc][]RobotID
@@ -61,6 +62,8 @@ func (b *Board) Update(ta, tb botapi.Turn_List) {
 			b.hurtBot(bot, CollisionDamage)
 		}
 	}
+	// Get rid of anyone who died in a collision
+	b.clearTheDead()
 
 	// Ok, we've moved everyone into place and hurt them for bumping into each
 	// other, now we issue attacks
@@ -68,10 +71,93 @@ func (b *Board) Update(ta, tb botapi.Turn_List) {
 	// self-destructing when someone could have killed them, it makes for better
 	// strategy this way
 
-	// TODO: attacks
-	// TODO: self destructs
+	// Allow all attacks to be issued before removing bots, because there's no
+	// good, sensical way to order attacks. They all happen simultaneously
+	b.issueAttacks(ta)
+	b.issueAttacks(tb)
+
+	// Get rid of anyone who was viciously murdered
+	b.clearTheDead()
+
+	// Boom goes the dynamite
+	b.issueSelfDestructs(ta)
+	b.issueSelfDestructs(tb)
+
+	// Get rid of anyone killed in some kamikaze-shenanigans
+	b.clearTheDead()
 
 	b.Round++
+}
+
+func (b *Board) issueAttacks(ts botapi.Turn_List) {
+	for i := 0; i < ts.Len(); i++ {
+		t := ts.At(i)
+		if t.Which() != botapi.Turn_Which_attack {
+			continue
+		}
+
+		// They're attacking
+		loc := b.robotLoc(RobotID(t.Id()))
+		xOff, yOff := directionOffsets(t.Attack())
+		attackLoc := Loc{
+			X: loc.X + xOff,
+			Y: loc.Y + yOff,
+		}
+
+		// If there's a bot at the attack location, make them sad
+		// NOTE: You *can* hurt attack your own robots
+		victim := b.At(attackLoc)
+		if victim != nil {
+			b.hurtBot(victim, AttackDamage)
+		}
+	}
+}
+
+func (b *Board) issueSelfDestructs(ts botapi.Turn_List) {
+	for i := 0; i < ts.Len(); i++ {
+		t := ts.At(i)
+		if t.Which() != botapi.Turn_Which_selfDestruct {
+			continue
+		}
+
+		// They're Metro-booming on production:
+		// (https://www.youtube.com/watch?v=NiM5ARaexPE)
+		loc := b.robotLoc(RobotID(t.Id()))
+		for _, boomLoc := range b.surrounding(loc) {
+			// If there's a bot in the blast radius
+			victim := b.At(boomLoc)
+			if victim != nil {
+				b.hurtBot(victim, DestructDamage)
+			}
+		}
+
+		bomber := b.At(loc)
+		// Kill 'em
+		b.hurtBot(bomber, SelfDamage)
+	}
+}
+
+func (b *Board) surrounding(loc Loc) []Loc {
+	offs := []int{-1, 0, 1}
+
+	// At most 8 surrounding locations
+	vLocs := make([]Loc, 0, 8)
+	for _, ox := range offs {
+		for _, oy := range offs {
+			// Skip the explosion location
+			if ox == 0 && oy == 0 {
+				continue
+			}
+			l := Loc{
+				X: loc.X + ox,
+				Y: loc.Y + oy,
+			}
+			if b.isValidLoc(l) {
+				vLocs = append(vLocs, l)
+			}
+		}
+	}
+	return vLocs
 }
 
 func (b *Board) addCollisions(c collisionMap, ts botapi.Turn_List) {
@@ -86,11 +172,20 @@ func (b *Board) addCollisions(c collisionMap, ts botapi.Turn_List) {
 
 func (b *Board) hurtBot(r *Robot, damage int) {
 	r.Health -= damage
-	// Smite them
-	if r.Health <= 0 {
-		loc := b.robotLoc(r.ID)
-		ind := b.cellIndex(loc)
-		b.cells[ind] = nil // BOoOoOM, roasted
+}
+
+func (b *Board) clearTheDead() {
+	for _, bot := range b.cells {
+		if bot == nil {
+			continue
+		}
+
+		// Smite them
+		if bot.Health <= 0 {
+			loc := b.robotLoc(bot.ID)
+			ind := b.cellIndex(loc)
+			b.cells[ind] = nil // BOoOoOM, roasted
+		}
 	}
 }
 
@@ -116,18 +211,8 @@ func (b *Board) nextLoc(id RobotID, t botapi.Turn) Loc {
 	}
 
 	// They're moving, return where they're going
-	var xOff, yOff int
-	switch t.Move() {
-	case botapi.Direction_north:
-		yOff = -1
-	case botapi.Direction_south:
-		yOff = 1
-	case botapi.Direction_east:
-		xOff = 1
-	case botapi.Direction_west:
-		xOff = -1
-	}
 
+	xOff, yOff := directionOffsets(t.Move())
 	nextLoc := Loc{
 		X: currentLoc.X + xOff,
 		Y: currentLoc.Y + yOff,
@@ -140,6 +225,21 @@ func (b *Board) nextLoc(id RobotID, t botapi.Turn) Loc {
 	// TODO: Penalize people for creating incompetent bots that like travelling
 	// to invalid locations, which is the case if we've reached here.
 	return currentLoc
+}
+
+func directionOffsets(dir botapi.Direction) (x, y int) {
+	var xOff, yOff int
+	switch dir {
+	case botapi.Direction_north:
+		yOff = -1
+	case botapi.Direction_south:
+		yOff = 1
+	case botapi.Direction_east:
+		xOff = 1
+	case botapi.Direction_west:
+		xOff = -1
+	}
+	return xOff, yOff
 }
 
 // TODO: Jesus Christ this is inefficient, we should have a map from ids to
@@ -184,6 +284,7 @@ func (b *Board) IsFinished() bool {
 // At returns the robot at a location or nil if not found.
 func (b *Board) At(loc Loc) *Robot {
 	if !b.isValidLoc(loc) {
+		// TODO: Is panic the right thing to do here?
 		panic("location out of bounds")
 	}
 	return b.cells[loc.Y*b.Size.X+loc.X]
