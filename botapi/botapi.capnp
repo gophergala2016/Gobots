@@ -57,7 +57,7 @@ struct Turn {
     attack @2 :Direction;
 
     selfDestruct @4 :Void;
-    # Does damage to all surrounding ships (even diagonals).
+    # Does damage to all surrounding bots (even diagonals).
   }
 }
 
