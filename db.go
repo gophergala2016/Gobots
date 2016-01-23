@@ -2,7 +2,7 @@ package main
 
 import "github.com/gophergala2016/Gobots/botapi"
 
-type db interface {
+type datastore interface {
 	// Users
 	createUser( /* user ID/creds */ ) error
 

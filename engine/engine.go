@@ -15,17 +15,28 @@ type Board struct {
 	nextID RobotID
 }
 
-// NewBoard creates an empty board of the given size.
-func NewBoard(w, h int) *Board {
+// EmptyBoard creates an empty board of the given size.
+func EmptyBoard(w, h int) *Board {
 	return &Board{
 		cells: make([]*Robot, w*h),
 		Size:  Loc{w, h},
 	}
 }
 
+// NewBoard creates an initialized game board for two factions.
+func NewBoard(w, h int) *Board {
+	// TODO: fill in initial conditions
+	return EmptyBoard(w, h)
+}
+
 func (b *Board) Update() {
 	// TODO
 	b.Round++
+}
+
+// IsFinished reports whether the game is finished.
+func (b *Board) IsFinished() bool {
+	return b.Round >= 100
 }
 
 // At returns the robot at a location or nil if not found.

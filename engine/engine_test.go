@@ -7,8 +7,8 @@ import (
 	"zombiezen.com/go/capnproto2"
 )
 
-func TestNewBoardIsEmpty(t *testing.T) {
-	b := NewBoard(3, 5)
+func TestEmptyBoardIsEmpty(t *testing.T) {
+	b := EmptyBoard(3, 5)
 	if b.Size.X != 3 {
 		t.Errorf("b.Size.X = %d; want 3", b.Size.X)
 	}
@@ -26,7 +26,7 @@ func TestNewBoardIsEmpty(t *testing.T) {
 }
 
 func TestBoard_Set(t *testing.T) {
-	b := NewBoard(3, 5)
+	b := EmptyBoard(3, 5)
 	loc := Loc{1, 2}
 	b.Set(loc, &Robot{
 		ID:      1234,
@@ -76,7 +76,7 @@ func TestUpdate(t *testing.T) {
 	}
 	for i, test := range tests {
 		t.Logf("tests[%d], size = %v, round = %d", i, test.size, test.initRound)
-		b := NewBoard(test.size.X, test.size.Y)
+		b := EmptyBoard(test.size.X, test.size.Y)
 		b.Round = test.initRound
 		for l, r := range test.init {
 			t.Logf("  -> set %v to %#v", l, r)
@@ -118,7 +118,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestToWire(t *testing.T) {
-	b := NewBoard(4, 6)
+	b := EmptyBoard(4, 6)
 	b.Set(Loc{1, 2}, &Robot{ID: 254, Health: 50, Faction: 0})
 	b.Set(Loc{3, 4}, &Robot{ID: 973, Health: 12, Faction: 1})
 	b.Round = 42
