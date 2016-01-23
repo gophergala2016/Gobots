@@ -51,7 +51,24 @@ func (e *aiEndpoint) handleConn(c net.Conn) {
 	aic.drop()
 }
 
-// TODO: list online AIs method
+// listOnlineAIs lists the active AIs connected to the server right now.  The AIs can be passed over to startMatch.
+func (e *aiEndpoint) listOnlineAIs() []onlineAI {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	online := make([]onlineAI, 0, len(e.online))
+	for id, client := range e.online {
+		info, err := e.ds.lookupAI(id)
+		if err != nil {
+			log.Printf("Failed to lookup AI %s: %v", id, err)
+			continue
+		}
+		online = append(online, onlineAI{
+			info:   *info,
+			client: client,
+		})
+	}
+	return online
+}
 
 // connect adds an online AI, given the secret auth token.
 func (e *aiEndpoint) connect(token string, ai botapi.Ai) (aiID, error) {
