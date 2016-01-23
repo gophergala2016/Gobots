@@ -5,6 +5,17 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Saturday January 23, 2016 - 9:09 AM
+
+Fearing that my colleague may be hopelessly lost and confused by my "Commits
+from Last Night", I added in the basic matchmaking structure in match.go.  While
+incomplete, it handles the parts that require the most Cap'n Proto knowledge:
+the connection setup etc.  Now you can start an `aiEndpoint` on a socket and
+just start querying for online AIs.  Once you want to run a match, call
+`runMatch` and it will block until the match completes.  There are still TODOs,
+but my travel schedule dictates I must leave them to you.  Good luck, comrade!
+-Ross
+
 ### Friday January 22, 2016 - 11:35 PM
 
 I fear that my only contribution for the night will be these README updates. My
