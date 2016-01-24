@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
-	"io"
 	"strconv"
 	"time"
 
@@ -154,6 +153,9 @@ func (db *dbImpl) lookupAI(id aiID) (*aiInfo, error) {
 	err := db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(AIBucket)
 		dat := b.Get([]byte(id))
+		if len(dat) == 0 {
+			return errDatastoreNotFound
+		}
 
 		buf := bytes.NewReader(dat)
 		return gob.NewDecoder(buf).Decode(&info)
@@ -167,11 +169,14 @@ func (db *dbImpl) lookupAIToken(token string) (*aiInfo, error) {
 		tb := tx.Bucket(TokensBucket)
 		idBytes := tb.Get([]byte(token))
 		if len(idBytes) == 0 {
-			// TODO not found error
+			return errDatastoreNotFound
 		}
 
 		b := tx.Bucket(AIBucket)
 		dat := b.Get(idBytes)
+		if len(dat) == 0 {
+			return errDatastoreNotFound
+		}
 
 		buf := bytes.NewReader(dat)
 		return gob.NewDecoder(buf).Decode(&info)
@@ -214,6 +219,9 @@ func (db *dbImpl) addRound(id gameID, round botapi.Replay_Round) error {
 		b := tx.Bucket(GameBucket)
 		key := []byte(id)
 		data := b.Get(key)
+		if len(data) == 0 {
+			return errDatastoreNotFound
+		}
 		msg, err := capnp.Unmarshal(copyBytes(data))
 		if err != nil {
 			return err
@@ -278,6 +286,9 @@ func (db *dbImpl) lookupGame(id gameID) (botapi.Replay, error) {
 	err := db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(GameBucket)
 		data := b.Get([]byte(id))
+		if len(data) == 0 {
+			return errDatastoreNotFound
+		}
 
 		msg, err := capnp.Unmarshal(copyBytes(data))
 		if err != nil {
@@ -287,9 +298,6 @@ func (db *dbImpl) lookupGame(id gameID) (botapi.Replay, error) {
 		return err
 	})
 
-	if err == io.EOF {
-		err = errDatastoreNotFound
-	}
 	return r, err
 }
 
