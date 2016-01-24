@@ -5,6 +5,15 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Saturday January 23, 2016 - 7:04 PM
+
+I've been sitting in this cafe for approximately five hours. This push will
+contain such goodies as GitHub OAuth integration, secure cookies, working user
+storage to a local key/value DB, and various other pleasantries and whatnot.
+However, I'm getting fidgety and Korean Karaoke is imminent. Expect my next
+commits to look more like \#CommitsFromLastNight \#BallmerPeak
+\#IDon'tEvenHaveATwitter \#I'mTheWorst \#IHopeIEscapedTheseHashtagsProperly
+
 ### Saturday January 23, 2016 - 4:28 PM
 
 First attempt at connecting server to client! RPC took place, but it crashed
@@ -24,6 +33,7 @@ productivity train, and a lot of the game logic is implemented. I also hit
 Oh, and I'm caffeinated as all hell, which is probably helping move things
 along.
 ![Drinking things down](http://i.imgur.com/WM8tlQv.jpg)
+-Brandon
 
 ### Saturday January 23, 2016 - 9:09 AM
 
