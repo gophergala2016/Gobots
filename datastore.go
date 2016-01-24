@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
+	"errors"
 	"time"
 
 	"zombiezen.com/go/capnproto2"
@@ -103,31 +104,35 @@ func (db *dbImpl) loadUser(uID userID) (*player, error) {
 
 // AIs
 func (db *dbImpl) createAI(u userID, info *aiInfo) (id aiID, token string, err error) {
-	return aiID(0), "", nil
+	return aiID(0), "", errDatastoreNotImplemented
 }
 
 func (db *dbImpl) listAIsForUser(u userID) ([]*aiInfo, error) {
-	return nil, nil
+	return nil, errDatastoreNotImplemented
 }
 
 func (db *dbImpl) lookupAI(id aiID) (*aiInfo, error) {
-	return nil, nil
+	return nil, errDatastoreNotImplemented
 }
 
 func (db *dbImpl) lookupAIToken(token string) (*aiInfo, error) {
-	return nil, nil
+	return nil, errDatastoreNotImplemented
 }
 
 // Games
 func (db *dbImpl) startGame(ai1, ai2 aiID, init botapi.Board) (gameID, error) {
-	return "", nil
+	return "", errDatastoreNotImplemented
 
 }
 
 func (db *dbImpl) addRound(id gameID, round botapi.Replay_Round) error {
-	return nil
+	return errDatastoreNotImplemented
 }
 
 func (db *dbImpl) lookupGame(id gameID) (botapi.Replay, error) {
-	return botapi.NewReplay(&capnp.Segment{})
+	_, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
+	replay, _ := botapi.NewReplay(seg)
+	return replay, nil
 }
+
+var errDatastoreNotImplemented = errors.New("gobots: datastore operation not implemented")

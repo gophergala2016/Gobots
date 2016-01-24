@@ -51,8 +51,7 @@ func main() {
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
 
-	// TODO: pass datastore to startAIEndpoint
-	globalAIEndpoint, err = startAIEndpoint(*apiAddr, nil)
+	globalAIEndpoint, err = startAIEndpoint(*apiAddr, db)
 	if err != nil {
 		log.Fatal("AI RPC endpoint failed to start:", err)
 	}
