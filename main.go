@@ -62,7 +62,7 @@ func main() {
 	if err != nil {
 		log.Fatal("AI RPC endpoint failed to start:", err)
 	}
-	err := http.ListenAndServe(*addr, nil)
+	err = http.ListenAndServe(*addr, nil)
 	if err != nil {
 		log.Fatal("Yeah...so about that whole server thing: ", err)
 	}
