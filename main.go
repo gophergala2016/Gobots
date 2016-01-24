@@ -45,7 +45,9 @@ func main() {
 	}
 
 	http.HandleFunc("/", withLogin(serveIndex))
+	http.HandleFunc("/game/", withLogin(serveGame))
 	http.HandleFunc("/auth", withLogin(serveAuth))
+	http.HandleFunc("/loadBots", withLogin(loadBots))
 
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
@@ -62,7 +64,34 @@ func main() {
 }
 
 func serveIndex(c context) {
-	if err := templates.ExecuteTemplate(c, "index.html", tmplData{}); err != nil {
+	data := tmplData{
+		Data: map[string]interface{}{
+			"Bots": globalAIEndpoint.listOnlineAIs(),
+		},
+	}
+
+	if err := templates.ExecuteTemplate(c, "index.html", data); err != nil {
+		serveError(c.w, err)
+	}
+}
+
+func serveGame(c context) {
+	replay, _ := db.lookupGame(c.gameID())
+
+	data := tmplData{
+		Data: map[string]interface{}{
+			"Replay": replay,
+			"GameID": c.gameID(),
+			// TODO: Use this one when not testing
+			//"Exists": err != errDatastoreNotFound,
+			"Exists": true,
+		},
+		Scripts: []template.URL{
+			"/js/gopher.js",
+			"/js/game.js",
+		},
+	}
+	if err := templates.ExecuteTemplate(c, "game.html", data); err != nil {
 		serveError(c.w, err)
 	}
 }
@@ -70,6 +99,10 @@ func serveIndex(c context) {
 func serveError(w http.ResponseWriter, err error) {
 	w.Write([]byte("Internal Server Error"))
 	log.Printf("Error: %v\n", err)
+}
+
+func loadBots(c context) {
+	// TODO: Do something with the endpoint in c.r.PostFormValue("endpoint")
 }
 
 func serveAuth(c context) {

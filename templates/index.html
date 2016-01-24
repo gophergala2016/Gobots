@@ -1,14 +1,25 @@
+<div class="splash">
+  <h1 class="splash-head">Welcome to Gobots</h1>
+    {{if not .Player}}
+      <p>
+        <a href="https://github.com/login/oauth/authorize?client_id={{.ClientID}}&redirect_uri={{.RedirectUri}}&state={{.Random}}" class="pure-button pure-button-primary">Sign in with GitHub</a>
+      </p>
+    {{end}}
+    <h2 class="splash-subhead">Bots Online</h2>
+    {{ range $bot := .Data.Bots }}
+      <div>{{ $bot.Info.Nick }}</div>
+    {{ end }}
 
-<div class="splash-container">
-    <div class="splash">
-      <h1 class="splash-head">Welcome to Gobots</h1>
-        <p class="splash-subhead">
-          I stole literally all of this from <a href="http://purecss.io">Pure CSS</a>
-        </p>
-        <p>
-        {{if not .Player}}
-          <a href="https://github.com/login/oauth/authorize?client_id={{.ClientID}}&redirect_uri={{.RedirectUri}}&state={{.Random}}" class="pure-button pure-button-primary">Sign in with GitHub</a>
-        {{end}}
-        </p>
-    </div>
+    {{if .Player}}
+      <h2 class="splash-subhead">Add Bots</h2>
+      <form class="pure-form" method="POST" action="/loadBots">
+        <fieldset>
+          <input type="text" placeholder="Endpoint URL" name="endpoint" id="endpoint">
+          <button type="submit" class="pure-button pure-button-primary">Load Bots</button>
+        </fieldset>
+      </form>
+    {{ end }}
+    <p class="splash-subhead">
+      I stole literally all of this from <a href="http://purecss.io">Pure CSS</a>
+    </p>
 </div>

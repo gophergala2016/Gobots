@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
+	"io"
 	"strconv"
 	"time"
 
@@ -41,8 +42,13 @@ func initDB(dbName string) (datastore, error) {
 	}
 
 	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte("Users"))
-		return err
+		for _, b := range [][]byte{UserBucket, GameBucket, AIBucket, TokensBucket} {
+			if _, err := tx.CreateBucketIfNotExists(b); err != nil {
+				return err
+			}
+		}
+
+		return nil
 	})
 
 	return &dbImpl{db}, err
@@ -58,7 +64,7 @@ type gameID string
 
 type aiInfo struct {
 	id    aiID
-	nick  string
+	Nick  string
 	token string
 
 	wins   int
@@ -124,7 +130,6 @@ func (db *dbImpl) lookupAI(id aiID) (*aiInfo, error) {
 		buf := bytes.NewReader(dat)
 		return gob.NewDecoder(buf).Decode(&info)
 	})
-	// TODO not found error
 	return info, err
 }
 
@@ -199,10 +204,14 @@ func (db *dbImpl) lookupGame(id gameID) (botapi.Replay, error) {
 		return err
 	})
 
+	if err == io.EOF {
+		err = errDatastoreNotFound
+	}
 	return r, err
 }
 
 var errDatastoreNotImplemented = errors.New("gobots: datastore operation not implemented")
+var errDatastoreNotFound = errors.New("gobots: datastore entity not found")
 
 // NOTE: Definitely definitely only call this from inside a transaction
 func newGameID(b *bolt.Bucket) gameID {

@@ -7,12 +7,14 @@ type tmpl struct {
 }
 
 type tmplData struct {
+	Active      int
 	Host        string
 	RedirectUri template.URL
 	Random      string
 	ClientID    string
 	Data        map[string]interface{}
 	Player      *player
+	Scripts     []template.URL
 }
 
 func (t *tmpl) ExecuteTemplate(c context, name string, data tmplData) error {

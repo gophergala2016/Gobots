@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 // I'm sure I'll need this eventually, and am definitely not prematurely
 // optimizing.
@@ -22,4 +25,8 @@ func newContext(w http.ResponseWriter, r *http.Request) context {
 type player struct {
 	Name      string   // GitHub username, probably
 	Endpoints []string // Servers they have hosting AI
+}
+
+func (c *context) gameID() gameID {
+	return gameID(strings.Split(c.r.URL.Path, "/")[2])
 }

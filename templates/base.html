@@ -1,5 +1,5 @@
 {{define "head"}}
-<html>
+<html ng-app="gobotApp">
   <head>
     <title>Gobots</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
@@ -9,11 +9,12 @@
   <body>
     <div class="header">
         <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
-            <a class="pure-menu-heading" href="">Gobots</a>
+            <a class="pure-menu-heading" href="/">Gobots</a>
 
             <ul class="pure-menu-list">
-                <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link">Home</a></li>
-                <li class="pure-menu-item"><a href="#" class="pure-menu-link">Bots Online</a></li>
+                <li class="pure-menu-item {{if eq .Active 0}}pure-menu-selected{{end}}"><a href="/" class="pure-menu-link">Home</a></li>
+                <li class="pure-menu-item {{if eq .Active 1}}pure-menu-selected{{end}}"><a href="/bots" class="pure-menu-link">Bots Online</a></li>
+                <li class="pure-menu-item {{if eq .Active 2}}pure-menu-selected{{end}}"><a href="/matches" class="pure-menu-link">Matches</a></li>
                 <li class="pure-menu-item">{{if .Player}}Hello {{.Player.Name}}{{end}}</li>
             </ul>
         </div>
@@ -22,6 +23,10 @@
 
 {{define "foot"}}
     <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+    {{ range .Scripts }}
+      <script src="{{.}}"></script>
+    {{ end }}
   </body>
 </html>
 {{end}}

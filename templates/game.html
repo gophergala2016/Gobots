@@ -1,0 +1,25 @@
+{{ if .Data.Exists }}
+<div class="splash-container">
+  <div class="splash">
+    <h1 class="splash-head">Game</h1>
+    <div ng-controller="GameController">
+    </div>
+  </div>
+</div>
+{{ else }}
+<div class="splash-container">
+  <div class="splash">
+    <h1 class="splash-head">Game Not Found</h1>
+        <p class="splash-subhead">
+          ID {{ .Data.GameID }} doesn't exist
+        </p>
+    </div>
+  </div>
+</div>
+{{ end }}
+
+
+<script>
+  // This is probably (hopefully) escaped by Go's templating system
+  var GameID = "{{ .Data.GameID }}";
+</script>

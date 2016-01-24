@@ -66,7 +66,7 @@ func (e *aiEndpoint) listOnlineAIs() []onlineAI {
 			continue
 		}
 		online = append(online, onlineAI{
-			info:   *info,
+			Info:   *info,
 			client: client,
 		})
 	}
@@ -120,7 +120,7 @@ func runMatch(ctx gocontext.Context, ds datastore, aiA, aiB *onlineAI) error {
 	_, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
 	wb, _ := botapi.NewRootBoard(seg)
 	b.ToWire(wb, 0)
-	gid, err := ds.startGame(aiA.info.id, aiB.info.id, wb)
+	gid, err := ds.startGame(aiA.Info.id, aiB.Info.id, wb)
 	if err != nil {
 		return err
 	}
@@ -158,7 +158,7 @@ func runMatch(ctx gocontext.Context, ds datastore, aiA, aiB *onlineAI) error {
 }
 
 type onlineAI struct {
-	info   aiInfo
+	Info   aiInfo
 	client botapi.Ai
 }
 
