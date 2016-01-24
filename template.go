@@ -6,10 +6,21 @@ type tmpl struct {
 	*template.Template
 }
 
-func (t *tmpl) ExecuteTemplate(c context, name string, data map[string]interface{}) error {
-	data["Host"] = c.r.Host
-	data["Random"] = imAnIdiot
-	data["ClientID"] = clientId
+type tmplData struct {
+	Host        string
+	RedirectUri template.URL
+	Random      string
+	ClientID    string
+	Data        map[string]interface{}
+	Player      *player
+}
+
+func (t *tmpl) ExecuteTemplate(c context, name string, data tmplData) error {
+	data.Host = c.r.Host
+	data.RedirectUri = template.URL("http://" + c.r.Host + "/auth")
+	data.Random = c.magicToken
+	data.ClientID = clientId
+	data.Player = c.p
 
 	if err := t.Template.ExecuteTemplate(c.w, "head.html", data); err != nil {
 		return err

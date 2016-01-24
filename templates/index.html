@@ -1,12 +1,14 @@
 
 <div class="splash-container">
     <div class="splash">
-        <h1 class="splash-head">Gobots</h1>
+      <h1 class="splash-head">Welcome to Gobots</h1>
         <p class="splash-subhead">
           I stole literally all of this from <a href="http://purecss.io">Pure CSS</a>
         </p>
         <p>
-        <a href="https://github.com/login/oauth/authorize?client_id={{.ClientID}}&redirect_uri={{.Host}}/auth&state={{.Random}}" class="pure-button pure-button-primary">Sign in with GitHub</a>
+        {{if not .Player}}
+          <a href="https://github.com/login/oauth/authorize?client_id={{.ClientID}}&redirect_uri={{.RedirectUri}}&state={{.Random}}" class="pure-button pure-button-primary">Sign in with GitHub</a>
+        {{end}}
         </p>
     </div>
 </div>
