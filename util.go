@@ -50,10 +50,10 @@ func withLogin(handler func(c context)) func(w http.ResponseWriter, r *http.Requ
 	}
 }
 
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var letters = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func genName(n int) string {
-	b := make([]rune, n)
+	b := make([]byte, n)
 	r := rand.New(cryptoRandSource{})
 	for i := range b {
 		b[i] = letters[r.Intn(len(letters))]
