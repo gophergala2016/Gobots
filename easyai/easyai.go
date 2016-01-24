@@ -20,6 +20,23 @@ func (b *Board) At(loc Loc) *Robot {
 	return b.Cells[loc.Y][loc.X]
 }
 
+// IsInside reports whether loc is inside the board bounds.
+func (b *Board) IsInside(loc Loc) bool {
+	return loc.X >= 0 && loc.X < len(b.Cells[0]) && loc.Y >= 0 && loc.Y < len(b.Cells)
+}
+
+// Find finds a robot on the board that matches the given function.
+func (b *Board) Find(f func(*Robot) bool) *Robot {
+	for _, row := range b.Cells {
+		for _, r := range row {
+			if f(r) {
+				return r
+			}
+		}
+	}
+	return nil
+}
+
 // A Robot is a piece on the board.
 type Robot struct {
 	ID      uint32
@@ -44,6 +61,34 @@ type AI interface {
 // Loc is a coordinate pair.
 type Loc struct {
 	X, Y int
+}
+
+func (loc Loc) Add(d Direction) Loc {
+	switch d {
+	case North:
+		return Loc{X: loc.X, Y: loc.Y - 1}
+	case South:
+		return Loc{X: loc.X, Y: loc.Y + 1}
+	case West:
+		return Loc{X: loc.X - 1, Y: loc.Y}
+	case East:
+		return Loc{X: loc.X + 1, Y: loc.Y}
+	default:
+		return loc
+	}
+}
+
+// Distance returns the Manhattan distance between two locations.
+func Distance(a, b Loc) int {
+	dx := a.X - b.X
+	if dx < 0 {
+		dx = -dx
+	}
+	dy := a.Y - b.Y
+	if dy < 0 {
+		dy = -dy
+	}
+	return dx + dy
 }
 
 // A Turn represents what a robot will do.  The zero value waits the turn.

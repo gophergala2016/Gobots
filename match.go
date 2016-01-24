@@ -21,12 +21,15 @@ type aiEndpoint struct {
 	online map[aiID]botapi.Ai
 }
 
-func startAIEndpoint(addr string) (*aiEndpoint, error) {
+func startAIEndpoint(addr string, ds datastore) (*aiEndpoint, error) {
 	l, err := net.Listen("tcp", addr)
 	if err != nil {
 		return nil, err
 	}
-	e := &aiEndpoint{online: make(map[aiID]botapi.Ai)}
+	e := &aiEndpoint{
+		ds:     ds,
+		online: make(map[aiID]botapi.Ai),
+	}
 	go e.listen(l)
 	return e, nil
 }

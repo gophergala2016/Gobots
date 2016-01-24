@@ -14,13 +14,15 @@ import (
 )
 
 var (
-	addr      = flag.String("addr", ":8000", "server address")
+	addr      = flag.String("addr", ":8000", "HTTP server address")
+	apiAddr   = flag.String("api_addr", ":8001", "RPC server address")
 	templates = tmpl{template.Must(template.ParseGlob("templates/*.html"))}
 
-	players roster
-	db      datastore
-	secretz string
-	s       *securecookie.SecureCookie
+	players          roster
+	db               datastore
+	secretz          string
+	s                *securecookie.SecureCookie
+	globalAIEndpoint *aiEndpoint
 )
 
 const (
@@ -48,6 +50,12 @@ func main() {
 
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
+
+	// TODO: pass datastore to startAIEndpoint
+	globalAIEndpoint, err = startAIEndpoint(*apiAddr, nil)
+	if err != nil {
+		log.Fatal("AI RPC endpoint failed to start:", err)
+	}
 
 	err = http.ListenAndServe(*addr, nil)
 	if err != nil {
