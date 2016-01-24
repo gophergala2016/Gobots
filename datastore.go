@@ -103,7 +103,7 @@ func (db *dbImpl) loadUser(uID userID) (*player, error) {
 		b := tx.Bucket(UserBucket)
 		dat := b.Get([]byte(uID))
 
-		buf := bytes.NewBuffer(dat)
+		buf := bytes.NewReader(dat)
 		dec := gob.NewDecoder(buf)
 
 		return dec.Decode(&p)
@@ -114,7 +114,35 @@ func (db *dbImpl) loadUser(uID userID) (*player, error) {
 
 // AIs
 func (db *dbImpl) createAI(u userID, info *aiInfo) (id aiID, token string, err error) {
-	return aiID(0), "", errDatastoreNotImplemented
+	err = db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket(AIBucket)
+		idNum, err := b.NextSequence()
+		if err != nil {
+			return err
+		}
+		id = aiID(strconv.FormatUint(idNum, 10))
+		token = genName(32)
+		newInfo := &aiInfo{
+			id:    id,
+			Nick:  info.Nick,
+			token: token,
+		}
+		var buf bytes.Buffer
+		if err := gob.NewEncoder(&buf).Encode(newInfo); err != nil {
+			return err
+		}
+		if err := b.Put([]byte(id), buf.Bytes()); err != nil {
+			return err
+		}
+
+		tb := tx.Bucket(TokensBucket)
+		if err := tb.Put([]byte(token), []byte(id)); err != nil {
+			return err
+		}
+
+		return nil
+	})
+	return
 }
 
 func (db *dbImpl) listAIsForUser(u userID) ([]*aiInfo, error) {
@@ -182,12 +210,67 @@ func (db *dbImpl) startGame(ai1, ai2 aiID, init botapi.Board) (gameID, error) {
 }
 
 func (db *dbImpl) addRound(id gameID, round botapi.Replay_Round) error {
-	_, err := db.lookupGame(id)
+	return db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket(GameBucket)
+		key := []byte(id)
+		data := b.Get(key)
+		msg, err := capnp.Unmarshal(copyBytes(data))
+		if err != nil {
+			return err
+		}
+		orig, err := botapi.ReadRootReplay(msg)
+		if err != nil {
+			return err
+		}
+		newMsg, err := addReplayRound(orig, round)
+		if err != nil {
+			return err
+		}
+		newData, err := newMsg.Marshal()
+		if err != nil {
+			return err
+		}
+		return b.Put(key, newData)
+	})
+}
+
+func addReplayRound(orig botapi.Replay, round botapi.Replay_Round) (*capnp.Message, error) {
+	newMsg, seg, err := capnp.NewMessage(capnp.SingleSegment(nil))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	// TODO: Add round to Replay
-	return errDatastoreNotImplemented
+	newReplay, err := botapi.NewRootReplay(seg)
+	if err != nil {
+		return nil, err
+	}
+	gid, err := orig.GameId()
+	if err != nil {
+		return nil, err
+	}
+	if err := newReplay.SetGameId(gid); err != nil {
+		return nil, err
+	}
+	initBoard, err := orig.InitialBoard()
+	if err != nil {
+		return nil, err
+	}
+	if err := newReplay.SetInitialBoard(initBoard); err != nil {
+		return nil, err
+	}
+	origRounds, err := orig.Rounds()
+	if err != nil {
+		return nil, err
+	}
+	rounds, _ := botapi.NewReplay_Round_List(seg, int32(origRounds.Len())+1)
+	for i := 0; i < origRounds.Len(); i++ {
+		if err := rounds.Set(i, origRounds.At(i)); err != nil {
+			return nil, err
+		}
+	}
+	if err := rounds.Set(rounds.Len()-1, round); err != nil {
+		return nil, err
+	}
+	return newMsg, nil
 }
 
 func (db *dbImpl) lookupGame(id gameID) (botapi.Replay, error) {
@@ -196,7 +279,7 @@ func (db *dbImpl) lookupGame(id gameID) (botapi.Replay, error) {
 		b := tx.Bucket(GameBucket)
 		data := b.Get([]byte(id))
 
-		msg, err := capnp.Unmarshal(data)
+		msg, err := capnp.Unmarshal(copyBytes(data))
 		if err != nil {
 			return err
 		}
@@ -208,6 +291,12 @@ func (db *dbImpl) lookupGame(id gameID) (botapi.Replay, error) {
 		err = errDatastoreNotFound
 	}
 	return r, err
+}
+
+func copyBytes(b []byte) []byte {
+	bb := make([]byte, len(b))
+	copy(bb, b)
+	return bb
 }
 
 var errDatastoreNotImplemented = errors.New("gobots: datastore operation not implemented")

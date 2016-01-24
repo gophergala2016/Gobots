@@ -1,6 +1,7 @@
 package main
 
 import (
+	cryptorand "crypto/rand"
 	"errors"
 	"io/ioutil"
 	"math/rand"
@@ -49,12 +50,13 @@ func withLogin(handler func(c context)) func(w http.ResponseWriter, r *http.Requ
 	}
 }
 
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var letters = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func genName(n int) string {
-	b := make([]rune, n)
+	b := make([]byte, n)
+	r := rand.New(cryptoRandSource{})
 	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+		b[i] = letters[r.Intn(len(letters))]
 	}
 	return string(b)
 }
@@ -111,3 +113,23 @@ func loadCookie(r *http.Request) (nutritionFacts, error) {
 		return nutritionFacts{}, err
 	}
 }
+
+type cryptoRandSource struct{}
+
+func (cryptoRandSource) Int63() int64 {
+	var buf [8]byte
+	_, err := cryptorand.Read(buf[:])
+	if err != nil {
+		panic(err)
+	}
+	return int64(buf[0]) |
+		int64(buf[1])<<8 |
+		int64(buf[2])<<16 |
+		int64(buf[3])<<24 |
+		int64(buf[4])<<32 |
+		int64(buf[5])<<40 |
+		int64(buf[6])<<48 |
+		int64(buf[7]&0x7f)<<56
+}
+
+func (cryptoRandSource) Seed(int64) {}
