@@ -17,7 +17,7 @@ func main() {
 func GetReplayFromString(replayString string) *js.Object {
 	// TODO: replayString -> []byte -> Replay -> js.Object
 	// In the mean time, fake board for testing
-	r := Replay{}
+	//r := Replay{}
 	return js.MakeWrapper(engine.NewBoard(8, 8))
 }
 

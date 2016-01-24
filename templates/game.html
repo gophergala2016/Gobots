@@ -1,19 +1,20 @@
 {{ if .Data.Exists }}
-<div class="splash-container">
-  <div class="splash">
-    <h1 class="splash-head">Game</h1>
-    <div ng-controller="GameController">
+<div class="splash">
+  <h1 class="splash-head">Game</h1>
+  <div class="gameBoardContainer">
+    <div ng-controller="GameController as game" class="gameBoard">
+      <div class="row" ng-repeat="row in game.rows track by $index">
+        <div class="cell" ng-repeat="cell in row track by $index" ng-class="{gopher: cell !== null}"></div>
+      </div>
     </div>
   </div>
 </div>
 {{ else }}
-<div class="splash-container">
-  <div class="splash">
-    <h1 class="splash-head">Game Not Found</h1>
-        <p class="splash-subhead">
-          ID {{ .Data.GameID }} doesn't exist
-        </p>
-    </div>
+<div class="splash">
+  <h1 class="splash-head">Game Not Found</h1>
+      <p class="splash-subhead">
+        ID {{ .Data.GameID }} doesn't exist
+      </p>
   </div>
 </div>
 {{ end }}

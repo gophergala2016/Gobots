@@ -38,6 +38,14 @@ func EmptyBoard(w, h int) *Board {
 	}
 }
 
+func (b *Board) Width() int {
+	return b.Size.X
+}
+
+func (b *Board) Height() int {
+	return b.Size.Y
+}
+
 func (b *Board) newID() RobotID {
 	b.nextID++
 	return b.nextID
@@ -312,6 +320,15 @@ func (b *Board) At(loc Loc) *Robot {
 		panic("location out of bounds")
 	}
 	return b.cells[loc.Y*b.Size.X+loc.X]
+}
+
+// At returns the robot at a location or nil if not found.
+func (b *Board) AtXY(x, y int) *Robot {
+	if !b.isValidLoc(Loc{x, y}) {
+		// TODO: Is panic the right thing to do here?
+		panic("location out of bounds")
+	}
+	return b.cells[y*b.Size.X+x]
 }
 
 // Set sets a robot at a particular location.

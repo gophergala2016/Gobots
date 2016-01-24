@@ -86,10 +86,6 @@ func serveGame(c context) {
 			//"Exists": err != errDatastoreNotFound,
 			"Exists": true,
 		},
-		Scripts: []template.URL{
-			"/js/gopher.js",
-			"/js/game.js",
-		},
 	}
 	if err := templates.ExecuteTemplate(c, "game.html", data); err != nil {
 		serveError(c.w, err)

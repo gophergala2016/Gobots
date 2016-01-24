@@ -1,3 +1,40 @@
+.gameBoardContainer {
+    display: inline-block;
+    position: relative;
+    width: 50%;
+}
+
+.gameBoardContainer:after {
+    content: '';
+    display: block;
+    margin-top: 100%;
+}
+
+.gameBoard {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.row {
+    display: flex;
+    flex: 1;
+}
+
+.cell {
+    border: 1px solid black;
+    background: white;
+    flex: 1;
+}
+
+.cell.gopher {
+  background: red;
+}
+
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -137,7 +174,7 @@ a.pure-button-primary {
     height: 50%;
     margin: auto;
     position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
+    top: -250px; left: 0; bottom: 0; right: 0;
     text-align: center;
     text-transform: uppercase;
 }
