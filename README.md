@@ -5,6 +5,11 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Sunday January 24, 2016 - 8:21 AM
+
+Couple of tweaks to the datastore to make the connect RPC not kill the server.
+Once `lookupAIToken` is implemented, we'll be in business. -Ross
+
 ### Saturday January 23, 2016 - 7:04 PM
 
 I've been sitting in this cafe for approximately five hours. This push will
