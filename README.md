@@ -5,6 +5,10 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Saturday January 23, 2016 - 4:22 PM
+
+Wrote a bad AI and I feel bad. -Ross
+
 ### Saturday January 23, 2016 - 2:43 PM
 
 That's more like it. After a good night's sleep and looking at the code base
