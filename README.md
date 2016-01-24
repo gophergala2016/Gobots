@@ -5,6 +5,10 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Sunday January 24, 2016 - 2:48 PM
+
+I'm back! -Ross
+
 ### Sunday January 24, 2016 - 1:35 PM
 
 Unfortunately didn't do any drunk committing last night (as you may be able to
