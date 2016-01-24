@@ -25,7 +25,8 @@ import (
 // written once
 
 var (
-	addr      = flag.String("addr", ":8000", "server address")
+	addr      = flag.String("addr", ":8000", "HTTP server address")
+	apiAddr   = flag.String("api_addr", ":8001", "RPC server address")
 	templates = tmpl{template.Must(template.ParseGlob("templates/*.html"))}
 
 	// You know, this should really be unique to each player, but I'm
@@ -33,6 +34,8 @@ var (
 	// TODO: Make this cookie-based...and not super easily hackable
 	imAnIdiot = genName(128)
 	secretz   string
+
+	globalAIEndpoint *aiEndpoint
 )
 
 const (
@@ -54,6 +57,11 @@ func main() {
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
 
+	var err error
+	globalAIEndpoint, err = startAIEndpoint(*apiAddr)
+	if err != nil {
+		log.Fatal("AI RPC endpoint failed to start:", err)
+	}
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
 		log.Fatal("Yeah...so about that whole server thing: ", err)
