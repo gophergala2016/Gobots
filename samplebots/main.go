@@ -25,6 +25,9 @@ var bots = map[string]easyai.Factory{
 	"aggro": func(gameID string) easyai.AI {
 		return aggro{}
 	},
+	"pathfinder": func(gameID string) easyai.AI {
+		return new(pathfinder)
+	},
 }
 
 func main() {
