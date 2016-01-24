@@ -10,7 +10,7 @@ Game](http://robotgame.net).
 Unfortunately didn't do any drunk committing last night (as you may be able to
 tell), though karaoke was a good time. Did a bit more database stuff, and
 getting GopherJS ready to do some stuff with replays so people can view games.
-Still to be done: adding rounds to a replay.
+Still to be done: adding rounds to a replay. -Brandon
 
 ### Sunday January 24, 2016 - 8:21 AM
 
