@@ -5,12 +5,16 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Sunday January 24, 2016 - 2:48 PM
+
+I'm back! -Ross
+
 ### Sunday January 24, 2016 - 1:35 PM
 
 Unfortunately didn't do any drunk committing last night (as you may be able to
 tell), though karaoke was a good time. Did a bit more database stuff, and
 getting GopherJS ready to do some stuff with replays so people can view games.
-Still to be done: adding rounds to a replay.
+Still to be done: adding rounds to a replay. -Brandon
 
 ### Sunday January 24, 2016 - 8:21 AM
 
