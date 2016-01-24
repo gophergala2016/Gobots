@@ -114,7 +114,35 @@ func (db *dbImpl) loadUser(uID userID) (*player, error) {
 
 // AIs
 func (db *dbImpl) createAI(u userID, info *aiInfo) (id aiID, token string, err error) {
-	return aiID(0), "", errDatastoreNotImplemented
+	err = db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket(AIBucket)
+		idNum, err := b.NextSequence()
+		if err != nil {
+			return err
+		}
+		id = aiID(strconv.FormatUint(idNum, 10))
+		token = genName(32)
+		newInfo := &aiInfo{
+			id:    id,
+			Nick:  info.Nick,
+			token: token,
+		}
+		var buf bytes.Buffer
+		if err := gob.NewEncoder(&buf).Encode(newInfo); err != nil {
+			return err
+		}
+		if err := b.Put([]byte(id), buf.Bytes()); err != nil {
+			return err
+		}
+
+		tb := tx.Bucket(TokensBucket)
+		if err := tb.Put([]byte(token), []byte(id)); err != nil {
+			return err
+		}
+
+		return nil
+	})
+	return
 }
 
 func (db *dbImpl) listAIsForUser(u userID) ([]*aiInfo, error) {
