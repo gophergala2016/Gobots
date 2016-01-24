@@ -5,6 +5,11 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Saturday January 23, 2016 - 4:28 PM
+
+First attempt at connecting server to client! RPC took place, but it crashed
+because the datastore variable is nil.  RPCs are happening! -Ross
+
 ### Saturday January 23, 2016 - 4:22 PM
 
 Wrote a bad AI and I feel bad. -Ross
