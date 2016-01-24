@@ -65,7 +65,9 @@ type aiInfo struct {
 }
 
 var (
-	UserBucket = []byte("Users")
+	UserBucket   = []byte("Users")
+	AIBucket     = []byte("AI")
+	TokensBucket = []byte("AISecretToken")
 )
 
 func (db *dbImpl) createUser(uID userID) error {
@@ -112,11 +114,34 @@ func (db *dbImpl) listAIsForUser(u userID) ([]*aiInfo, error) {
 }
 
 func (db *dbImpl) lookupAI(id aiID) (*aiInfo, error) {
-	return nil, errDatastoreNotImplemented
+	var info *aiInfo
+	err := db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(AIBucket)
+		dat := b.Get([]byte(id))
+
+		buf := bytes.NewReader(dat)
+		return gob.NewDecoder(buf).Decode(&info)
+	})
+	// TODO not found error
+	return info, err
 }
 
 func (db *dbImpl) lookupAIToken(token string) (*aiInfo, error) {
-	return nil, errDatastoreNotImplemented
+	var info *aiInfo
+	err := db.View(func(tx *bolt.Tx) error {
+		tb := tx.Bucket(TokensBucket)
+		idBytes := tb.Get([]byte(token))
+		if len(idBytes) == 0 {
+			// TODO not found error
+		}
+
+		b := tx.Bucket(AIBucket)
+		dat := b.Get(idBytes)
+
+		buf := bytes.NewReader(dat)
+		return gob.NewDecoder(buf).Decode(&info)
+	})
+	return info, err
 }
 
 // Games
