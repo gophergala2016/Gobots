@@ -136,7 +136,22 @@ func runMatch(ctx gocontext.Context, ds datastore, aiA, aiB *onlineAI) error {
 			// TODO: Something with errors
 		}
 		b.Update(ra.results, rb.results)
-		// TODO: db.addRound
+		_, s, err := capnp.NewMessage(capnp.SingleSegment(nil))
+		if err != nil {
+			return err
+		}
+		r, err := botapi.NewRootReplay_Round(s)
+		if err != nil {
+			return err
+		}
+
+		wireBoard, err := r.NewEndBoard()
+		if err != nil {
+			return err
+		}
+		b.ToWire(wireBoard, engine.P1Faction)
+		// TODO: Concatenate ra.results and rb.results and make that the move_list for this round
+		db.addRound(gid, r)
 	}
 
 	return nil

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
+	"strconv"
 	"time"
 
 	"zombiezen.com/go/capnproto2"
@@ -66,6 +67,7 @@ type aiInfo struct {
 
 var (
 	UserBucket   = []byte("Users")
+	GameBucket   = []byte("Games")
 	AIBucket     = []byte("AI")
 	TokensBucket = []byte("AISecretToken")
 )
@@ -146,18 +148,68 @@ func (db *dbImpl) lookupAIToken(token string) (*aiInfo, error) {
 
 // Games
 func (db *dbImpl) startGame(ai1, ai2 aiID, init botapi.Board) (gameID, error) {
-	return "", errDatastoreNotImplemented
+	var gID gameID
+	err := db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket(GameBucket)
+
+		msg, s, err := capnp.NewMessage(capnp.SingleSegment(nil))
+		if err != nil {
+			return err
+		}
+		r, err := botapi.NewRootReplay(s)
+		if err != nil {
+			return err
+		}
+		gID = newGameID(b)
+		r.SetGameId(string(gID))
+		r.SetInitialBoard(init)
+
+		data, err := msg.Marshal()
+		if err != nil {
+			return err
+		}
+
+		return b.Put([]byte(gID), data)
+	})
+
+	return gID, err
 
 }
 
 func (db *dbImpl) addRound(id gameID, round botapi.Replay_Round) error {
+	_, err := db.lookupGame(id)
+	if err != nil {
+		return err
+	}
+	// TODO: Add round to Replay
 	return errDatastoreNotImplemented
 }
 
 func (db *dbImpl) lookupGame(id gameID) (botapi.Replay, error) {
-	_, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
-	replay, _ := botapi.NewReplay(seg)
-	return replay, nil
+	var r botapi.Replay
+	err := db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(GameBucket)
+		data := b.Get([]byte(id))
+
+		msg, err := capnp.Unmarshal(data)
+		if err != nil {
+			return err
+		}
+		r, err = botapi.ReadRootReplay(msg)
+		return err
+	})
+
+	return r, err
 }
 
 var errDatastoreNotImplemented = errors.New("gobots: datastore operation not implemented")
+
+// NOTE: Definitely definitely only call this from inside a transaction
+func newGameID(b *bolt.Bucket) gameID {
+	id, err := b.NextSequence()
+	if err != nil {
+		// Screw it, they're getting a random ID
+		return gameID(genName(64))
+	}
+	return gameID(strconv.FormatUint(id, 16))
+}

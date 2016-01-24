@@ -18,7 +18,6 @@ var (
 	apiAddr   = flag.String("api_addr", ":8001", "RPC server address")
 	templates = tmpl{template.Must(template.ParseGlob("templates/*.html"))}
 
-	players          roster
 	db               datastore
 	secretz          string
 	s                *securecookie.SecureCookie

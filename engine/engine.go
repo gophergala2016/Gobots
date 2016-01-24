@@ -11,6 +11,9 @@ import (
 // *Robots and RobotIDs, it's gross
 
 const (
+	P1Faction       = 1
+	P2Faction       = 2
+	InitialHealth   = 5
 	CollisionDamage = 1
 	AttackDamage    = 2
 	DestructDamage  = 2
@@ -35,10 +38,31 @@ func EmptyBoard(w, h int) *Board {
 	}
 }
 
+func (b *Board) newID() RobotID {
+	b.nextID++
+	return b.nextID
+}
+
 // NewBoard creates an initialized game board for two factions.
 func NewBoard(w, h int) *Board {
-	// TODO: fill in initial conditions
-	return EmptyBoard(w, h)
+	b := EmptyBoard(w, h)
+
+	// Just line the ends with robots
+	for i := 0; i < h; i++ {
+		la, lb := Loc{0, i}, Loc{w - 1, i}
+		ca, cb := b.cellIndex(la), b.cellIndex(lb)
+		b.cells[ca] = &Robot{
+			ID:      b.newID(),
+			Health:  InitialHealth,
+			Faction: P1Faction,
+		}
+		b.cells[cb] = &Robot{
+			ID:      b.newID(),
+			Health:  InitialHealth,
+			Faction: P1Faction,
+		}
+	}
+	return b
 }
 
 func (b *Board) Update(ta, tb botapi.Turn_List) {
