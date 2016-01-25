@@ -178,6 +178,9 @@ a.pure-button-primary {
     text-align: center;
     text-transform: uppercase;
 }
+    .ai-token{
+      text-transform: none;
+    }
 
 /* This is the main heading that appears on the blue section */
 .splash-head {

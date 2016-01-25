@@ -9,4 +9,8 @@ angular.module('gobotApp', [])
       game.rows[y][x] = board.AtXY(x,y)
     }
   }
+})
+.config(function($interpolateProvider) {
+  $interpolateProvider.startSymbol('//');
+  $interpolateProvider.endSymbol('//');
 });
