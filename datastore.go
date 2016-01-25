@@ -147,7 +147,25 @@ func (db *dbImpl) createAI(u userID, info *aiInfo) (id aiID, token string, err e
 }
 
 func (db *dbImpl) listAIsForUser(u userID) ([]*aiInfo, error) {
-	return nil, errDatastoreNotImplemented
+	var result []*aiInfo
+	err := db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(AIBucket)
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			if len(v) == 0 {
+				continue
+			}
+			info := new(aiInfo)
+			if err := gob.NewDecoder(bytes.NewReader(v)).Decode(info); err != nil {
+				continue
+			}
+			if info.Owner == u {
+				result = append(result, info)
+			}
+		}
+		return nil
+	})
+	return result, err
 }
 
 func (db *dbImpl) lookupAI(id aiID) (*aiInfo, error) {
