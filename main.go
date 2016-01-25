@@ -114,6 +114,8 @@ func serveError(w http.ResponseWriter, err error) {
 func startMatch(c context) {
 	//ai1, ai2 := c.r.PostFormValue("ai1"), c.r.PostFormValue("ai2")
 	//TODO DOIAFJHJKSHLAJSDLKJASLKDJ
+
+	http.Redirect(c.w, c.r, "/game/GAMEIDHERE", http.StatusFound)
 }
 
 func loadBots(c context) {
