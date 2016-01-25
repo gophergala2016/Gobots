@@ -81,8 +81,8 @@ func (e *aiEndpoint) connect(token string, ai botapi.Ai) (aiID, error) {
 	}
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	e.online[info.id] = ai
-	return info.id, nil
+	e.online[info.ID] = ai
+	return info.ID, nil
 }
 
 // removeAIs drops AIs from online, usually via disconnection.
@@ -120,7 +120,7 @@ func runMatch(ctx gocontext.Context, ds datastore, aiA, aiB *onlineAI) error {
 	_, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
 	wb, _ := botapi.NewRootBoard(seg)
 	b.ToWire(wb, 0)
-	gid, err := ds.startGame(aiA.Info.id, aiB.Info.id, wb)
+	gid, err := ds.startGame(aiA.Info.ID, aiB.Info.ID, wb)
 	if err != nil {
 		return err
 	}
