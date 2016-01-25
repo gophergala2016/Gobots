@@ -67,7 +67,7 @@ func NewBoard(w, h int) *Board {
 		b.cells[cb] = &Robot{
 			ID:      b.newID(),
 			Health:  InitialHealth,
-			Faction: P1Faction,
+			Faction: P2Faction,
 		}
 	}
 	return b
