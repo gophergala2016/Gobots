@@ -1,8 +1,10 @@
 package main
 
 import (
+	"github.com/gophergala2016/Gobots/botapi"
 	"github.com/gophergala2016/Gobots/engine"
 	"github.com/gopherjs/gopherjs/js"
+	"zombiezen.com/go/capnproto2"
 )
 
 func main() {
@@ -15,10 +17,10 @@ func main() {
 }
 
 func GetReplayFromString(replayString string) *js.Object {
-	// TODO: replayString -> []byte -> Replay -> js.Object
-	// In the mean time, fake board for testing
-	//r := Replay{}
-	return js.MakeWrapper(engine.NewBoard(8, 8))
+	// Will it work? It's not Unicode clean
+	msg, _ := capnp.Unmarshal([]byte(replayString))
+	r, _ := botapi.ReadRootReplay(msg)
+	return js.MakeWrapper(r)
 }
 
 func GetReplay(gameID string) *js.Object {

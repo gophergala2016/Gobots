@@ -11,6 +11,8 @@ import (
 	"net/url"
 	"strings"
 
+	"zombiezen.com/go/capnproto2"
+
 	"github.com/gorilla/securecookie"
 )
 
@@ -81,15 +83,14 @@ func serveIndex(c context) {
 }
 
 func serveGame(c context) {
-	replay, _ := db.lookupGame(c.gameID())
-
+	replay, err := db.lookupGame(c.gameID())
+	d := capnp.ToData(replay)
 	data := tmplData{
 		Data: map[string]interface{}{
-			"Replay": replay,
-			"GameID": c.gameID(),
-			// TODO: Use this one when not testing
-			//"Exists": err != errDatastoreNotFound,
-			"Exists": true,
+			"Replay":       replay,
+			"GameID":       c.gameID(),
+			"Exists":       err != errDatastoreNotFound,
+			"ReplayString": string(d),
 		},
 	}
 	if err := templates.ExecuteTemplate(c, "game.html", data); err != nil {
