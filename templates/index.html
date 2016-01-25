@@ -10,7 +10,7 @@
       <div>{{ $bot.Info.Nick }}</div>
     {{ end }}
     <h2 class="splash-subhead">Fight Bots</h2>
-      <form class="pure-form add-bot" method="POST" action="/startMatch">
+      <form class="pure-form fight-bot" method="POST" action="/startMatch">
     <select name="ai1">
       {{ range $bot := .Data.Bots }}
         <option value="{{ $bot.Info.ID }}">{{ $bot.Info.Nick }}</option>
