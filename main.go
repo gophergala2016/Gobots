@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -99,6 +100,13 @@ func serveError(w http.ResponseWriter, err error) {
 
 func loadBots(c context) {
 	// TODO: Do something with the endpoint in c.r.PostFormValue("endpoint")
+	uid := userID("TODO Brandon how do I get the UID????")
+	_, token, err := db.createAI(uid, &aiInfo{Nick: c.r.PostFormValue("endpoint")})
+	if err != nil {
+		serveError(c.w, err)
+		return
+	}
+	fmt.Fprintln(c.w, "Congrats, your token is:", token)
 }
 
 func serveAuth(c context) {
