@@ -52,6 +52,7 @@ func main() {
 	http.HandleFunc("/gameWire/", withLogin(serveGameWire))
 	http.HandleFunc("/auth", withLogin(serveAuth))
 	http.HandleFunc("/loadBots", withLogin(loadBots))
+	http.HandleFunc("/startMatch", withLogin(startMatch))
 
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
 	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img"))))
@@ -108,6 +109,11 @@ func serveGameWire(c context) {
 func serveError(w http.ResponseWriter, err error) {
 	w.Write([]byte("Internal Server Error"))
 	log.Printf("Error: %v\n", err)
+}
+
+func startMatch(c context) {
+	//ai1, ai2 := c.r.PostFormValue("ai1"), c.r.PostFormValue("ai2")
+	//TODO DOIAFJHJKSHLAJSDLKJASLKDJ
 }
 
 func loadBots(c context) {

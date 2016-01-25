@@ -7,14 +7,25 @@
     {{end}}
     <h2 class="splash-subhead">Bots Online</h2>
     {{ range $bot := .Data.Bots }}
-      <form class="pure-form" method="POST" action="/startMatch">
-        <div>{{ $bot.Info.Nick }}</div>
-        <fieldset>
-          <input type="text" placeholder="Endpoint URL" name="endpoint" id="endpoint">
-          <button type="submit" class="pure-button pure-button-primary">Start Match</button>
-        </fieldset>
-      </form>
+      <div>{{ $bot.Info.Nick }}</div>
     {{ end }}
+    <h2 class="splash-subhead">Fight Bots</h2>
+      <form class="pure-form add-bot" method="POST" action="/startMatch">
+    <select name="ai1">
+      {{ range $bot := .Data.Bots }}
+        <option value="{{ $bot.Info.ID }}">{{ $bot.Info.Nick }}</option>
+      {{ end }}
+    </select>
+    <p>vs</p>
+    <select name="ai2">
+      {{ range $bot := .Data.Bots }}
+        <option value="{{ $bot.Info.ID }}">{{ $bot.Info.Nick }}</option>
+      {{ end }}
+    </select>
+          <button type="submit" class="pure-button pure-button-primary">Fight</button>
+      </form>
+
+
 
     {{if .Player}}
       <h2 class="splash-subhead">Add Bots</h2>
