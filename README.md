@@ -5,6 +5,10 @@ Game](http://robotgame.net).
 
 ## Stream of Consciousness Logs
 
+### Sunday January 24, 2016 - 4:02 PM
+
+Shit.  I can connect with a token, but the lookups fail.  Debugging... -Ross
+
 ### Sunday January 24, 2016 - 3:04 PM
 
 To the previous update: Woot! -Brandon
