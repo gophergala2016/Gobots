@@ -99,8 +99,7 @@ func serveError(w http.ResponseWriter, err error) {
 }
 
 func loadBots(c context) {
-	// TODO: Do something with the endpoint in c.r.PostFormValue("endpoint")
-	uid := userID("TODO Brandon how do I get the UID????")
+	uid := userID(c.player.Name)
 	_, token, err := db.createAI(uid, &aiInfo{Nick: c.r.PostFormValue("endpoint")})
 	if err != nil {
 		serveError(c.w, err)

@@ -7,7 +7,13 @@
     {{end}}
     <h2 class="splash-subhead">Bots Online</h2>
     {{ range $bot := .Data.Bots }}
-      <div>{{ $bot.Info.Nick }}</div>
+      <form class="pure-form" method="POST" action="/startMatch">
+        <div>{{ $bot.Info.Nick }}</div>
+        <fieldset>
+          <input type="text" placeholder="Endpoint URL" name="endpoint" id="endpoint">
+          <button type="submit" class="pure-button pure-button-primary">Start Match</button>
+        </fieldset>
+      </form>
     {{ end }}
 
     {{if .Player}}
