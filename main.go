@@ -69,6 +69,9 @@ func serveIndex(c context) {
 		Data: map[string]interface{}{
 			"Bots": globalAIEndpoint.listOnlineAIs(),
 		},
+		Scripts: []template.URL{
+			"/js/main.js",
+		},
 	}
 
 	if err := templates.ExecuteTemplate(c, "index.html", data); err != nil {

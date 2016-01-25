@@ -18,12 +18,14 @@
 
     {{if .Player}}
       <h2 class="splash-subhead">Add Bots</h2>
-      <form class="pure-form" method="POST" action="/loadBots">
+      <form class="pure-form add-bot" method="POST" action="/loadBots">
         <fieldset>
-          <input type="text" placeholder="Endpoint URL" name="endpoint" id="endpoint">
-          <button type="submit" class="pure-button pure-button-primary">Load Bots</button>
+          <input type="text" placeholder="Bot Nickname" name="nick" id="nick">
+          <button type="submit" class="pure-button pure-button-primary">Get Token</button>
         </fieldset>
       </form>
+      <p class="splash-subhead ai-token">
+      </p>
     {{ end }}
     <p class="splash-subhead">
       I stole literally all of this from <a href="http://purecss.io">Pure CSS</a>
