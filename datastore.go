@@ -62,10 +62,10 @@ type aiID string
 type gameID string
 
 type aiInfo struct {
-	id    aiID
+	ID    aiID
 	Nick  string
 	Owner userID
-	token string
+	Token string
 
 	wins   int
 	losses int
@@ -123,9 +123,9 @@ func (db *dbImpl) createAI(u userID, info *aiInfo) (id aiID, token string, err e
 		id = aiID(strconv.FormatUint(idNum, 10))
 		token = genName(32)
 		newInfo := &aiInfo{
-			id:    id,
+			ID:    id,
 			Nick:  info.Nick,
-			token: token,
+			Token: token,
 			Owner: u,
 		}
 		var buf bytes.Buffer
