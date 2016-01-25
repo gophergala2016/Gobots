@@ -64,6 +64,7 @@ type gameID string
 type aiInfo struct {
 	id    aiID
 	Nick  string
+	Owner userID
 	token string
 
 	wins   int
@@ -125,6 +126,7 @@ func (db *dbImpl) createAI(u userID, info *aiInfo) (id aiID, token string, err e
 			id:    id,
 			Nick:  info.Nick,
 			token: token,
+			Owner: u,
 		}
 		var buf bytes.Buffer
 		if err := gob.NewEncoder(&buf).Encode(newInfo); err != nil {
