@@ -1,7 +1,7 @@
 angular.module('gobotApp', [])
 .controller('GameController', function() {
   var game = this;
-  var replay = Gobot.GetReplayFromString(replayStr);
+  var replay = Gobot.GetReplay("http://" + Host + "game/"+ GameID);
 
   game.setBoard = function(board) {
     game.rows = new Array(board.Height())

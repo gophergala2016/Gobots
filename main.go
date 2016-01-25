@@ -49,6 +49,7 @@ func main() {
 
 	http.HandleFunc("/", withLogin(serveIndex))
 	http.HandleFunc("/game/", withLogin(serveGame))
+	http.HandleFunc("/gameWire/", withLogin(serveGameWire))
 	http.HandleFunc("/auth", withLogin(serveAuth))
 	http.HandleFunc("/loadBots", withLogin(loadBots))
 
@@ -96,6 +97,12 @@ func serveGame(c context) {
 	if err := templates.ExecuteTemplate(c, "game.html", data); err != nil {
 		serveError(c.w, err)
 	}
+}
+
+func serveGameWire(c context) {
+	replay, _ := db.lookupGame(c.gameID())
+	d := capnp.ToData(replay)
+	c.w.Write(d)
 }
 
 func serveError(w http.ResponseWriter, err error) {

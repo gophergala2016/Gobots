@@ -1,8 +1,10 @@
 package main
 
 import (
+	"io/ioutil"
+	"net/http"
+
 	"github.com/gophergala2016/Gobots/botapi"
-	"github.com/gophergala2016/Gobots/engine"
 	"github.com/gopherjs/gopherjs/js"
 	"zombiezen.com/go/capnproto2"
 )
@@ -23,7 +25,11 @@ func GetReplayFromString(replayString string) *js.Object {
 	return js.MakeWrapper(r)
 }
 
-func GetReplay(gameID string) *js.Object {
-	// TODO: get bytes from server -> Replay -> js.Object
-	return js.MakeWrapper(&engine.Board{})
+func GetReplay(url string) *js.Object {
+	resp, _ := http.Get(url)
+	defer resp.Body.Close()
+	d, _ := ioutil.ReadAll(resp.Body)
+	msg, _ := capnp.Unmarshal(d)
+	r, _ := botapi.ReadRootReplay(msg)
+	return js.MakeWrapper(r)
 }
