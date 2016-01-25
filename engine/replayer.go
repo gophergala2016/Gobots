@@ -9,6 +9,10 @@ type Replay struct {
 	round int
 }
 
+func NewReplay(r botapi.Replay) *Replay {
+	return &Replay{r, 0}
+}
+
 func (r *Replay) NextBoard() *Board {
 	// TODO: Stop ignoring errors
 	if r.round == 0 {
