@@ -104,7 +104,7 @@ func serveError(w http.ResponseWriter, err error) {
 
 func loadBots(c context) {
 	uid := userID(c.p.Name)
-	_, token, err := db.createAI(uid, &aiInfo{Nick: c.r.PostFormValue("endpoint")})
+	_, token, err := db.createAI(uid, &aiInfo{Nick: c.r.PostFormValue("nick")})
 	if err != nil {
 		serveError(c.w, err)
 		return
